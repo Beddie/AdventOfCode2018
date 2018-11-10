@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="2017\Dag10.cs" />
     <Compile Include="2017\Dag9.cs" />
     <Compile Include="AdventBase.cs" />
     <Compile Include="AdventInterface.cs" />

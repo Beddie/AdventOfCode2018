@@ -61,6 +61,15 @@ namespace AdventCode.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 88,88,211,106,141,1,78,254,2,111,77,255,90,0,54,205.
+        /// </summary>
+        internal static string dag10_2017 {
+            get {
+                return ResourceManager.GetString("dag10_2017", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {{{{{{{{&lt;!!!&gt;!&gt;!!oiau!&gt;}}&lt;u!!!!,!!,e!!!&gt;&apos;&gt;}},{}}},{{{{},{}},{{&lt;&lt;&lt;&quot;!!!&gt;!!,,}!!!&gt;&apos;&gt;}},{&lt;!!{e&apos;a!!u!!u!!!!!oa&apos;!!u!&gt;!!eu!!!!!&gt;,&lt;!&gt;},&lt;,&gt;,&lt;}{!!u,!!!&gt;},&lt;!!!&gt;!!!&gt;&gt;}},{{&lt;!}aa!!{&apos;a!&gt;},&lt;!&gt;,&lt;!&gt;!&gt;,&lt;!u,&quot;aae!&gt;},&lt;&gt;,&lt;!!!&gt;!&gt;u,o!&gt;},&lt;!!!&gt;!!!&gt;,&lt;&quot;&lt;&apos;&gt;},{{&lt;,!&gt;},&lt;ae{&gt;},&lt;&lt;e!&gt;},&lt;a!!},}&gt;}},{{&lt;&gt;,{&lt;!!!&gt;!&gt;{!&gt;},&lt;!!!!!&gt;},&lt;!&gt;},&lt;!!!&gt;,&lt;!&gt;,&lt;!!o,&lt;,&gt;}},{&lt;{&apos;&gt;,{{&lt;&quot;{,&lt;!!!&gt;!&gt;!!!&gt;u!&gt;},&lt;ue!!!!u!!&apos;uua}!!!&gt;},&lt;&gt;}}},{&lt;&apos;e!!&gt;}}},{{{{},&lt;!&gt;},&lt;!!o&quot;&apos;!&gt;,&lt;u&quot;&lt;!!&lt;,o{&apos;a&gt;},{{}},{{},{{&lt;&apos;!!i&lt;&gt;},&lt;&quot;!!!!,!&gt;{{&gt;},{&lt;i&apos;&lt;{i&gt;}}},{{{&lt;!!o!!a!!&apos;!&gt;&apos;&gt;},&lt;eu!&gt;!}&quot;!&gt;,&lt;}i&gt;},{{&lt;!&gt;},&lt;oe!&gt;}, [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string dag9_2017 {

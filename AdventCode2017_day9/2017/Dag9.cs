@@ -1,12 +1,7 @@
 ﻿using AdventCode;
-using AdventCode.Enum;
 using AdventCode.Properties;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static AdventCode.AdventBase;
 
 namespace AdventCode2017
 {
@@ -15,7 +10,7 @@ namespace AdventCode2017
         public Dag9()
         {
             Calculate();
-            WriteDebug();
+            WriteDebugAnswers(this.GetType().Name);
         }
 
         public void Calculate()

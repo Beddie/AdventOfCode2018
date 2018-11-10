@@ -11,11 +11,17 @@ namespace AdventCode
     {
         public int Answer1 { get; set; }
         public int Answer2 { get; set; }
+        public bool Test { get; set; }
 
-        public void WriteDebug()
+        public void WriteDebugAnswers(object className)
         {
-            Debug.WriteLine($"Antwoord 1: {Answer1}");
-            Debug.WriteLine($"Antwoord 2: {Answer2}");
+            Debug.WriteLine($"{className.GetType().Name} Antwoord 1: {Answer1}");
+            Debug.WriteLine($"{className.GetType().Name} Antwoord 2: {Answer2}");
+        }
+
+        public void WriteDebug<T>(T write, object className)
+        {
+            Debug.WriteLine($"{className.GetType().Name}: {write}");
         }
     }
 }
