@@ -9,8 +9,8 @@ namespace AdventCode
 {
     public class AdventBase
     {
-        public int Answer1 { get; set; }
-        public int Answer2 { get; set; }
+        public object Answer1 { get; set; }
+        public object Answer2 { get; set; }
         public bool Test { get; set; }
 
         public void WriteDebugAnswers(object className)
