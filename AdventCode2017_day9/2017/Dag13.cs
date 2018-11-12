@@ -37,7 +37,7 @@ namespace AdventCode2017
             //isRootLevel?
             var isRootLevel = ((currentPicosecond % ((range - 1 ) * 2)) == 0) ;
             severityScore += isRootLevel ? range * layerPair.Key : 0;
-            answer2HelperScore = severityScore;
+            answer2HelperScore = isRootLevel && layerPair.Key == 0 ? 9999 : severityScore;
         }
 
         public void Calculate()

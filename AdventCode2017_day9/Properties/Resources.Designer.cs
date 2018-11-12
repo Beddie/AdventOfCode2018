@@ -142,6 +142,15 @@ namespace AdventCode.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to vbqugkhl.
+        /// </summary>
+        internal static string dag14_2017 {
+            get {
+                return ResourceManager.GetString("dag14_2017", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {{{{{{{{&lt;!!!&gt;!&gt;!!oiau!&gt;}}&lt;u!!!!,!!,e!!!&gt;&apos;&gt;}},{}}},{{{{},{}},{{&lt;&lt;&lt;&quot;!!!&gt;!!,,}!!!&gt;&apos;&gt;}},{&lt;!!{e&apos;a!!u!!u!!!!!oa&apos;!!u!&gt;!!eu!!!!!&gt;,&lt;!&gt;},&lt;,&gt;,&lt;}{!!u,!!!&gt;},&lt;!!!&gt;!!!&gt;&gt;}},{{&lt;!}aa!!{&apos;a!&gt;},&lt;!&gt;,&lt;!&gt;!&gt;,&lt;!u,&quot;aae!&gt;},&lt;&gt;,&lt;!!!&gt;!&gt;u,o!&gt;},&lt;!!!&gt;!!!&gt;,&lt;&quot;&lt;&apos;&gt;},{{&lt;,!&gt;},&lt;ae{&gt;},&lt;&lt;e!&gt;},&lt;a!!},}&gt;}},{{&lt;&gt;,{&lt;!!!&gt;!&gt;{!&gt;},&lt;!!!!!&gt;},&lt;!&gt;},&lt;!!!&gt;,&lt;!&gt;,&lt;!!o,&lt;,&gt;}},{&lt;{&apos;&gt;,{{&lt;&quot;{,&lt;!!!&gt;!&gt;!!!&gt;u!&gt;},&lt;ue!!!!u!!&apos;uua}!!!&gt;},&lt;&gt;}}},{&lt;&apos;e!!&gt;}}},{{{{},&lt;!&gt;},&lt;!!o&quot;&apos;!&gt;,&lt;u&quot;&lt;!!&lt;,o{&apos;a&gt;},{{}},{{},{{&lt;&apos;!!i&lt;&gt;},&lt;&quot;!!!!,!&gt;{{&gt;},{&lt;i&apos;&lt;{i&gt;}}},{{{&lt;!!o!!a!!&apos;!&gt;&apos;&gt;},&lt;eu!&gt;!}&quot;!&gt;,&lt;}i&gt;},{{&lt;!&gt;},&lt;oe!&gt;}, [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string dag9_2017 {
@@ -156,6 +165,57 @@ namespace AdventCode.Properties {
         internal static string Tdag10_2017 {
             get {
                 return ResourceManager.GetString("Tdag10_2017", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 0: 5
+        ///1: 2
+        ///2: 3
+        ///4: 4
+        ///6: 6
+        ///8: 4
+        ///10: 8
+        ///12: 6
+        ///14: 6
+        ///16: 8
+        ///18: 6
+        ///20: 9
+        ///22: 8
+        ///24: 10
+        ///26: 8
+        ///28: 8
+        ///30: 12
+        ///32: 8
+        ///34: 12
+        ///36: 10
+        ///38: 12
+        ///40: 12
+        ///42: 12
+        ///44: 12
+        ///46: 12
+        ///48: 14
+        ///50: 12
+        ///52: 14
+        ///54: 12
+        ///56: 14
+        ///58: 12
+        ///60: 14
+        ///62: 14
+        ///64: 14
+        ///66: 14
+        ///68: 14
+        ///70: 14
+        ///72: 14
+        ///76: 14
+        ///80: 18
+        ///84: 14
+        ///90: 18
+        ///92: 17.
+        /// </summary>
+        internal static string Tdag13_2017 {
+            get {
+                return ResourceManager.GetString("Tdag13_2017", resourceCulture);
             }
         }
         
