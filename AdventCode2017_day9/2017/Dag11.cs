@@ -11,6 +11,7 @@ namespace AdventCode2017
         private static bool test = true;
         private int x = 0;
         private int y = 0;
+        private int z = 0;
 
         private enum Direction
         {

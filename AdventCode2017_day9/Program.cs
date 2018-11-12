@@ -12,9 +12,7 @@ namespace AdventCode2017
     {
         static void Main(string[] args)
         {
-            //var day9 = new Dag9();
-            //var day10 = new Dag10();
-            var day11 = new Dag11();
+            var day13 = new Dag13();
         }
 
     }
