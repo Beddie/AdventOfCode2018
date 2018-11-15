@@ -6,10 +6,11 @@ using System.Linq;
 
 namespace AdventCode2017
 {
-    public class Dag10 : AdventBase, AdventInterface
+    public class Dag10T : AdventBase
     {
         private static bool test = false;
         private string text = test ? "3, 4, 1, 5" : Resources.dag10_2017;
+        private int index = 0;
 
         private List<int> baseList;
         private int baseLengthList;
@@ -18,7 +19,7 @@ namespace AdventCode2017
         private int amountToBeTaken(int knotlength) { return knotlength > remainingLengthToEndOfBaseList ? remainingLengthToEndOfBaseList : knotlength; }
         private int amountToBeTakenFromStartOfBaseList(int knotlength) { var usedAtTheEnd = knotlength - remainingLengthToEndOfBaseList; return usedAtTheEnd < 0 ? 0 : usedAtTheEnd; }
 
-        public Dag10()
+        public Dag10T()
         {
             baseList = Enumerable.Range(0, test ? 5 : 256).ToList();
             baseLengthList = baseList.Count();
@@ -27,8 +28,9 @@ namespace AdventCode2017
             var answer1 = Calculate(input1, 1);
             var answer2 = Calculate(input2, 64);
             var denseBaseList = DenseHash(answer2);
-            Answer1 = answer1.Take(2).Aggregate((prev, curr) => prev * curr);
-            Answer2 = denseBaseList.Select(x => x.ToString("x2")).Aggregate((prev, curr) => prev + curr);
+            Answer1 = answer1.Take(2).Aggregate( (prev, curr) => prev * curr);
+            Answer2 = denseBaseList.Select(x => x.ToString("x2")).Aggregate((prev, curr) => prev + curr).AsParallel().AsOrdered();
+            
             WriteDebugAnswers(this);
         }
 
@@ -39,7 +41,7 @@ namespace AdventCode2017
 
         private List<int> InitializeASCIIKnotList()
         {
-            return text.Select(c => (int)c).ToList().AddRange(new[]{17, 31, 73, 47, 23});
+           return  text.Select(c => (int)c).Concat(new List<int> { 17, 31, 73, 47, 23 }).ToList();
         }
 
         private List<int> DenseHash(List<int> hash)
@@ -51,7 +53,7 @@ namespace AdventCode2017
             var denseBaseList = new List<int>();
             for (int i = 0; i < blocksize; i++)
             {
-                var sparseHash = hash.Skip(blockSkip * blocksize).Take(blocksize).ToList();
+                var sparseHash = hash.Skip(blockSkip * blocksize).Take(blocksize).ToArray();
 
                 //XOR together
                 // A bitwise XOR takes two bit patterns of equal length and performs the logical exclusive OR operation on each pair of corresponding bits.
@@ -62,17 +64,21 @@ namespace AdventCode2017
                 //  = 0110(decimal 6)
 
                 var xorValue = 0;
-                foreach (var intVal in sparseHash)
-                {
-                    xorValue = xorValue ^ intVal;
-                }
-                denseBaseList.Add(xorValue);
+
+                xorValue = sparseHash.Aggregate((prev, curr) => prev ^ curr);
+
+
+                //foreach (var intVal in sparseHash)
+                //{
+                //    xorValue = xorValue ^ intVal;
+                //}
+                //denseBaseList.Add(xorValue);
                 blockSkip++;
             }
             return denseBaseList;
         }
 
-        public void Calculate(List<int> knotLengthList, int rounds)
+        public List<int> Calculate(List<int> knotLengthList, int rounds)
         {
             int index = 0;
             int skip = 0;
@@ -106,13 +112,15 @@ namespace AdventCode2017
                     UpdateIndexValue(knotLength);
                 }
             }
+
+            return baseList;
         }
 
         private void UpdateIndexValue(int knotlength)
         {
-            index = index + skip + knotlength;
-            if (index > baseLengthList) index = (index % baseLengthList);
-            skip++;
+            //index = index + skip + knotlength;
+            //if (index > baseLengthList) index = (index % baseLengthList);
+            //skip++;
         }
     }
 }
