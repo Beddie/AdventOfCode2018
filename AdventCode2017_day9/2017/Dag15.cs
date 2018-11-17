@@ -23,7 +23,7 @@ namespace AdventCode2017
         private const double dividingFactor = 2147483647d;
         private const int loopAmount = 5000000;
 
-        public void Calculate()
+        public void CalculateAnswerB()
         {
             var genA = baseList.First().GeneratorA;
             var genB = baseList.First().GeneratorB;
@@ -79,7 +79,7 @@ namespace AdventCode2017
 
         public Dag15()
         {
-            Calculate();
+            CalculateAnswerA();
             WriteDebugAnswers(this);
         }
 
@@ -92,5 +92,6 @@ namespace AdventCode2017
         {
             return string.Join(" ", data.Select(byt => Convert.ToString(byt, 2).PadLeft(8, '0')));
         }
+
     }
 }

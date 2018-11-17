@@ -151,6 +151,15 @@ namespace AdventCode.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to x5/11,s12,x10/4,pi/d,x11/0,s6,x14/3,pa/b,x6/13,pk/m,x3/9,s12,pg/d,x14/7,pi/b,x13/15,s5,x1/8,s3,x11/6,s6,x9/2,s13,x1/3,pj/a,x13/12,s6,x9/15,s1,x7/0,s1,x11/10,s6,x3/0,s6,x9/8,pl/k,x12/13,pb/n,x15/7,pg/l,x0/11,s12,x12/10,s11,x6/9,po/i,x8/3,pk/l,s2,x14/2,s15,x6/12,pj/p,x7/14,pb/f,x3/15,ph/l,x11/1,s9,pg/o,s9,x8/2,ph/l,s15,x14/0,s1,x13/6,pj/g,x14/7,s7,pi/o,x1/12,pm/a,x13/14,s12,x4/8,pp/c,x13/14,pb/a,x0/7,s4,x5/11,s12,x1/4,s11,x6/10,pi/h,x2/8,s14,x12/3,s12,x11/7,s15,x0/13,pk/a,x11/6,s15,x8/0,s8,x7/5,s10,x9/12,s15, [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string dag16_2017 {
+            get {
+                return ResourceManager.GetString("dag16_2017", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {{{{{{{{&lt;!!!&gt;!&gt;!!oiau!&gt;}}&lt;u!!!!,!!,e!!!&gt;&apos;&gt;}},{}}},{{{{},{}},{{&lt;&lt;&lt;&quot;!!!&gt;!!,,}!!!&gt;&apos;&gt;}},{&lt;!!{e&apos;a!!u!!u!!!!!oa&apos;!!u!&gt;!!eu!!!!!&gt;,&lt;!&gt;},&lt;,&gt;,&lt;}{!!u,!!!&gt;},&lt;!!!&gt;!!!&gt;&gt;}},{{&lt;!}aa!!{&apos;a!&gt;},&lt;!&gt;,&lt;!&gt;!&gt;,&lt;!u,&quot;aae!&gt;},&lt;&gt;,&lt;!!!&gt;!&gt;u,o!&gt;},&lt;!!!&gt;!!!&gt;,&lt;&quot;&lt;&apos;&gt;},{{&lt;,!&gt;},&lt;ae{&gt;},&lt;&lt;e!&gt;},&lt;a!!},}&gt;}},{{&lt;&gt;,{&lt;!!!&gt;!&gt;{!&gt;},&lt;!!!!!&gt;},&lt;!&gt;},&lt;!!!&gt;,&lt;!&gt;,&lt;!!o,&lt;,&gt;}},{&lt;{&apos;&gt;,{{&lt;&quot;{,&lt;!!!&gt;!&gt;!!!&gt;u!&gt;},&lt;ue!!!!u!!&apos;uua}!!!&gt;},&lt;&gt;}}},{&lt;&apos;e!!&gt;}}},{{{{},&lt;!&gt;},&lt;!!o&quot;&apos;!&gt;,&lt;u&quot;&lt;!!&lt;,o{&apos;a&gt;},{{}},{{},{{&lt;&apos;!!i&lt;&gt;},&lt;&quot;!!!!,!&gt;{{&gt;},{&lt;i&apos;&lt;{i&gt;}}},{{{&lt;!!o!!a!!&apos;!&gt;&apos;&gt;},&lt;eu!&gt;!}&quot;!&gt;,&lt;}i&gt;},{{&lt;!&gt;},&lt;oe!&gt;}, [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string dag9_2017 {

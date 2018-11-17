@@ -1,18 +1,10 @@
-﻿using AdventCode.Properties;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AdventCode2017
+﻿namespace AdventCode2017
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var day15 = new Dag15();
+            var day16 = new Dag16();
         }
 
     }

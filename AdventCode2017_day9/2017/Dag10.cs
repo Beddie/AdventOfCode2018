@@ -27,7 +27,7 @@ namespace AdventCode2017
         {
             InitializeBaseList();
             InitializeASCIIKnotList();
-            Calculate();
+            CalculateAnswerA();
             WriteDebugAnswers(this);
         }
 
@@ -59,7 +59,7 @@ namespace AdventCode2017
         }
 
 
-        public void Calculate()
+        public void CalculateAnswerA()
         {
            
             for (int i = 0; i < rounds; i++)
@@ -139,6 +139,9 @@ namespace AdventCode2017
             skip++;
         }
 
-
+        public void CalculateAnswerB()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

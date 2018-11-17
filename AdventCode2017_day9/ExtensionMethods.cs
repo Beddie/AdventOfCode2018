@@ -12,5 +12,6 @@ namespace AdventCode
         {
             return Convert.ToString((int)myInt, 2).PadLeft(padLeft, '0');
         }
+
     }
 }

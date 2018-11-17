@@ -42,7 +42,7 @@ namespace AdventCode2017
         {
             InitializeBaseList();
             InitializeConditionList();
-            Calculate();
+            CalculateAnswerA();
             WriteDebugAnswers(this);
         }
 
@@ -115,7 +115,7 @@ namespace AdventCode2017
             conditionList.Add(new DirectionCondition() { Direction = Direction.NorthWest, OppositeDirection = Direction.SouthEast, NeighbourA = Direction.SouthWest, NeighbourB = Direction.North });
         }
 
-        public void Calculate()
+        public void CalculateAnswerA()
         {
             foreach (var condition in conditionList)
             {
@@ -133,6 +133,11 @@ namespace AdventCode2017
 
             //Answer1 = baseList.Take(1).First() * baseList.Skip(1).First();
             //Answer2 = garbageScore;
+        }
+
+        public void CalculateAnswerB()
+        {
+            throw new NotImplementedException();
         }
     }
 }

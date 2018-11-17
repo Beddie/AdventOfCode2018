@@ -9,6 +9,7 @@ namespace AdventCode
 {
     public interface AdventInterface
     {
-        void Calculate();
+        void CalculateAnswerA();
+        void CalculateAnswerB();
     }
 }

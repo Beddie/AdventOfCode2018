@@ -17,7 +17,7 @@ namespace AdventCode2017
         public Dag14()
         {
             InitializeBaseList();
-            Calculate();
+            CalculateAnswerA();
             WriteDebugAnswers(this);
         }
         
@@ -62,7 +62,7 @@ namespace AdventCode2017
             //answer2HelperScore = severityScore;
         }
 
-        public void Calculate()
+        public void CalculateAnswerA()
         {
             //var LastPicosecond = baseList.Max(c => c.Key) + delayAmount;
             //for (int picosecond = 0 + delayAmount; picosecond <= LastPicosecond; picosecond++)
@@ -88,6 +88,9 @@ namespace AdventCode2017
             //Answer2 = delayAmount;
         }
 
-
+        public void CalculateAnswerB()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

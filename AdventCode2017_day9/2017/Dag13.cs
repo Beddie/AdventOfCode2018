@@ -19,7 +19,7 @@ namespace AdventCode2017
         public Dag13()
         {
             InitializeBaseList();
-            Calculate();
+            CalculateAnswerA();
             CalculateAnswer2();
             WriteDebugAnswers(this);
         }
@@ -40,7 +40,7 @@ namespace AdventCode2017
             answer2HelperScore = isRootLevel && layerPair.Key == 0 ? 9999 : severityScore;
         }
 
-        public void Calculate()
+        public void CalculateAnswerA()
         {
             var LastPicosecond = baseList.Max(c => c.Key) + delayAmount;
             for (int picosecond = 0 + delayAmount; picosecond <= LastPicosecond; picosecond++)
@@ -59,13 +59,16 @@ namespace AdventCode2017
             while (answer2HelperScore != 0) {
                 severityScore = 0;
                 delayAmount++;
-                Calculate();
+                CalculateAnswerA();
                 
             }
 
             Answer2 = delayAmount;
         }
 
-
+        public void CalculateAnswerB()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

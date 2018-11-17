@@ -9,11 +9,11 @@ namespace AdventCode2017
     {
         public Dag9()
         {
-            Calculate();
+            CalculateAnswerA();
             WriteDebugAnswers(this.GetType().Name);
         }
 
-        public void Calculate()
+        public void CalculateAnswerA()
         {
             string text = Resources.dag9_2017;
             var deleteNext = false;
@@ -71,5 +71,9 @@ namespace AdventCode2017
             Answer2 = garbageScore;
         }
 
+        public void CalculateAnswerB()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
