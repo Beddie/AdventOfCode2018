@@ -160,6 +160,73 @@ namespace AdventCode.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to set i 31
+        ///set a 1
+        ///mul p 17
+        ///jgz p p
+        ///mul a 2
+        ///add i -1
+        ///jgz i -2
+        ///add a -1
+        ///set i 127
+        ///set p 618
+        ///mul p 8505
+        ///mod p a
+        ///mul p 129749
+        ///add p 12345
+        ///mod p a
+        ///set b p
+        ///mod b 10000
+        ///snd b
+        ///add i -1
+        ///jgz i -9
+        ///jgz a 3
+        ///rcv b
+        ///jgz b -1
+        ///set f 0
+        ///set i 126
+        ///rcv a
+        ///rcv b
+        ///set p a
+        ///mul p -1
+        ///add p b
+        ///jgz p 4
+        ///snd a
+        ///set a b
+        ///jgz 1 3
+        ///snd b
+        ///set f 1
+        ///add i -1
+        ///jgz i -11
+        ///snd a
+        ///jgz f -16
+        ///jgz a -19.
+        /// </summary>
+        internal static string dag18_2017 {
+            get {
+                return ResourceManager.GetString("dag18_2017", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to set a 1
+        ///add a 2
+        ///mul a a
+        ///mod a 5
+        ///snd a
+        ///set a 0
+        ///rcv a
+        ///jgz a -1
+        ///set a 1
+        ///jgz a -2.
+        /// </summary>
+        internal static string dag18_2017_test {
+            get {
+                return ResourceManager.GetString("dag18_2017_test", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {{{{{{{{&lt;!!!&gt;!&gt;!!oiau!&gt;}}&lt;u!!!!,!!,e!!!&gt;&apos;&gt;}},{}}},{{{{},{}},{{&lt;&lt;&lt;&quot;!!!&gt;!!,,}!!!&gt;&apos;&gt;}},{&lt;!!{e&apos;a!!u!!u!!!!!oa&apos;!!u!&gt;!!eu!!!!!&gt;,&lt;!&gt;},&lt;,&gt;,&lt;}{!!u,!!!&gt;},&lt;!!!&gt;!!!&gt;&gt;}},{{&lt;!}aa!!{&apos;a!&gt;},&lt;!&gt;,&lt;!&gt;!&gt;,&lt;!u,&quot;aae!&gt;},&lt;&gt;,&lt;!!!&gt;!&gt;u,o!&gt;},&lt;!!!&gt;!!!&gt;,&lt;&quot;&lt;&apos;&gt;},{{&lt;,!&gt;},&lt;ae{&gt;},&lt;&lt;e!&gt;},&lt;a!!},}&gt;}},{{&lt;&gt;,{&lt;!!!&gt;!&gt;{!&gt;},&lt;!!!!!&gt;},&lt;!&gt;},&lt;!!!&gt;,&lt;!&gt;,&lt;!!o,&lt;,&gt;}},{&lt;{&apos;&gt;,{{&lt;&quot;{,&lt;!!!&gt;!&gt;!!!&gt;u!&gt;},&lt;ue!!!!u!!&apos;uua}!!!&gt;},&lt;&gt;}}},{&lt;&apos;e!!&gt;}}},{{{{},&lt;!&gt;},&lt;!!o&quot;&apos;!&gt;,&lt;u&quot;&lt;!!&lt;,o{&apos;a&gt;},{{}},{{},{{&lt;&apos;!!i&lt;&gt;},&lt;&quot;!!!!,!&gt;{{&gt;},{&lt;i&apos;&lt;{i&gt;}}},{{{&lt;!!o!!a!!&apos;!&gt;&apos;&gt;},&lt;eu!&gt;!}&quot;!&gt;,&lt;}i&gt;},{{&lt;!&gt;},&lt;oe!&gt;}, [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string dag9_2017 {
@@ -225,6 +292,55 @@ namespace AdventCode.Properties {
         internal static string Tdag13_2017 {
             get {
                 return ResourceManager.GetString("Tdag13_2017", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to set i 31
+        ///set a 1
+        ///mul p 17
+        ///jgz p p
+        ///mul a 2
+        ///add i -1
+        ///jgz i -2
+        ///add a -1
+        ///set i 127
+        ///set p 952
+        ///mul p 8505
+        ///mod p a
+        ///mul p 129749
+        ///add p 12345
+        ///mod p a
+        ///set b p
+        ///mod b 10000
+        ///snd b
+        ///add i -1
+        ///jgz i -9
+        ///jgz a 3
+        ///rcv b
+        ///jgz b -1
+        ///set f 0
+        ///set i 126
+        ///rcv a
+        ///rcv b
+        ///set p a
+        ///mul p -1
+        ///add p b
+        ///jgz p 4
+        ///snd a
+        ///set a b
+        ///jgz 1 3
+        ///snd b
+        ///set f 1
+        ///add i -1
+        ///jgz i -11
+        ///snd a
+        ///jgz f -16
+        ///jgz a -19.
+        /// </summary>
+        internal static string Tdag18_2017 {
+            get {
+                return ResourceManager.GetString("Tdag18_2017", resourceCulture);
             }
         }
         
