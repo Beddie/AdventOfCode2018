@@ -209,6 +209,21 @@ namespace AdventCode.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to snd 1
+        ///snd 2
+        ///snd p
+        ///rcv a
+        ///rcv b
+        ///rcv c
+        ///rcv d.
+        /// </summary>
+        internal static string dag18_2017_sendReceive_test {
+            get {
+                return ResourceManager.GetString("dag18_2017_sendReceive_test", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to set a 1
         ///add a 2
         ///mul a a

@@ -277,6 +277,15 @@ snd a
 jgz f -16
 jgz a -19</value>
   </data>
+  <data name="dag18_2017_sendReceive_test" xml:space="preserve">
+    <value>snd 1
+snd 2
+snd p
+rcv a
+rcv b
+rcv c
+rcv d</value>
+  </data>
   <data name="dag18_2017_test" xml:space="preserve">
     <value>set a 1
 add a 2
