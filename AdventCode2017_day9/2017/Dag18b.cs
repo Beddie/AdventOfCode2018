@@ -29,14 +29,7 @@ namespace AdventCode2017
 
         public void CalculateAnswerB()
         {
-        var programs = new List<Dag18Program>();
-
-            programs.Add(new Dag18Program(0, true));
-            //programs.Add(new Dag18Program(1, true));
-
-
-            Parallel.ForEach(programs, c => c.CalculateAnswerB());
-
+            new Dag18Program(0, true).CalculateAnswerB();
         }
     }
 }

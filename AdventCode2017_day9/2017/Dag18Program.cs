@@ -31,7 +31,8 @@ namespace AdventCode2017
         public static bool BLocked = false;
         public static bool AFinished = false;
         public static bool BFinished = false;
-
+        public static object mylock = new object();
+        public static object mylock2 = new object();
 
         public Dag18Program(int id = 0, bool answerB = false)
         {
@@ -103,9 +104,18 @@ namespace AdventCode2017
                 var currentDuetA = DuetPairsA[indexA];
                 var currentDuetB = DuetPairsB[indexB];
                 indexA = currentDuetA.Item2.DuetAction(VariablesA, indexA);
-                indexB = currentDuetB.Item2.DuetAction(VariablesA, indexB);
+                indexB = currentDuetB.Item2.DuetAction(VariablesB, indexB);
                 if (!ALocked) indexA++;
                 if (!BLocked) indexB++;
+
+
+                if (countSend % 10000 == 0)
+                {
+                    Debug.Write($"count {countSend} / ");
+                    Debug.Write(string.Join(",", VariablesA));
+                    Debug.WriteLine(" / " + string.Join(",", VariablesB));
+                }
+
                 if ((indexA >= DuetPairsA.Count() && indexB >= DuetPairsB.Count()) || (ALocked && BLocked))
                 {
                     break;
@@ -131,7 +141,9 @@ namespace AdventCode2017
                         DuetAction = (Variables, i) =>
                         {
                             soundHZ = GetVal(duetActions[1], Variables);
-                            queueList.Add((programID == 0 ? 1 : 0, GetVal(duetActions[1], Variables)));
+                            lock (mylock) {
+                                queueList.Add((programID == 0 ? 1 : 0, GetVal(duetActions[1], Variables)));
+                            }
                             if (programID == 0) { if (!BFinished) BLocked = false; }
                             else {
                                 if (!AFinished) ALocked = false; countSend += 1;
@@ -179,8 +191,12 @@ namespace AdventCode2017
 
                             if (queueList.Where(c => c.Item1 == programID).Any())
                             {
-                                var receiveValue = queueList.Where(c => c.Item1 == programID).First();
-                                queueList = queueList.Where(c => c.Item1 == programID).Skip(1).ToList().Concat(queueList.Where(c => c.Item1 != programID)).ToList();
+                                var receiveValue = queueList.Where(c => c.Item1 == programID).Take(1).FirstOrDefault();
+                                lock (mylock2)
+                                {
+                                    queueList = queueList.Where(c => c.Item1 == programID).Skip(1).ToList().Concat(queueList.Where(c => c.Item1 != programID).ToList()).ToList();
+                                }
+                                
                                 Variables[duetActions[1]] = receiveValue.Item2;
                             }
 
