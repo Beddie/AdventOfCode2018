@@ -109,7 +109,7 @@ namespace AdventCode2017
                 if (!BLocked) indexB++;
 
 
-                if (countSend % 10000 == 0)
+                if (countSend % 100 == 0)
                 {
                     Debug.Write($"count {countSend} / ");
                     Debug.Write(string.Join(",", VariablesA));
