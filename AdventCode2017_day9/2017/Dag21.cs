@@ -15,14 +15,13 @@ namespace AdventCode2017
     public class Dag21 : AdventBase, AdventInterface
     {
 
-        private bool test = true;
+        private bool test = false;
         private string puzzleString = Resources.dag21_2017;
+        private int iterations = 5;
         public Dag21()
         {
-
             CalculateAnswerA();
-            //  CalculateAnswerB();
-
+            CalculateAnswerB();
         }
 
         //../.# => ##./#../...
@@ -47,110 +46,58 @@ namespace AdventCode2017
             {
                 foreach (var rulestring in puzzleString.Split('\n'))
                 {
-                    var rule = rulestring.Replace(" ", "").Replace(">", "").Split('=');
+                    var rule = rulestring.Replace(" ", "").Replace(">", "").Replace("\r", "").Split('=');
                     rules.Add(pixelStringToSquare(rule[0]), pixelStringToSquare(rule[1]));
                 }
             }
+
             var startGrid = pixelStringToSquare(".#...####");
             var gridList = new List<byte[]>();
+            var newCreatedGrid = startGrid;
             gridList.Add(startGrid);
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < (test ? 2 : iterations); i++)
             {
-                //TODO refactor and improve
-                CreateNewGrid(ref gridList);
+                var newGridList = new List<byte[]>();
+                foreach (var newsq in gridList)
+                {
+                    newGridList.Add(GetNewSquare(newsq));
+                }
+                newCreatedGrid = Create1Grid(newGridList);
+                gridList = CreatedNewSquares(newCreatedGrid);
             }
+            Debug.WriteLine($"{newCreatedGrid.Where(c => c == (byte)1).Count()}");
         }
-
-        private void CreateNewGrid(ref List<byte[]> gridList)
-        {
-            var newGridList = new List<byte[]>();
-            foreach (var newsq in gridList)
-            {
-                newGridList.Add(GetNewSquare(newsq));
-            }
-            var newCreatedGrid = create1Grid(newGridList);
-            gridList = CreatedNewSquares(newCreatedGrid);
-        }
-
 
         /// <summary>
         /// Create 1 total grid (which is one / 1 byte[]) again, to be used in new evaluation
         /// </summary>
         /// <param name="squares"></param>
         /// <returns></returns>
-        private byte[] create1Grid(List<byte[]> squares)
+        private byte[] Create1Grid(List<byte[]> squares)
         {
-            var squareByteSize = squares.First().Length;
-            var square1Length = (int)Math.Sqrt(squareByteSize);
-
-            var grid1Length = squares.Count() > 1 ? (int)Math.Sqrt(squareByteSize) : square1Length;
-            var byteLength = squareByteSize * squares.Count();
+            var squareByteSize = squares.Sum(c => c.Length);
+            var square1Length = (int)Math.Sqrt(squares.First().Length);
+            var grid1Length = (int)Math.Sqrt(squareByteSize);
             var rowCount = square1Length * grid1Length;
-            var newByte = new byte[byteLength];
-            var x = 0;
-            var y = 1;
+            var newByte = new byte[squareByteSize];
+            int x = 0;
+            int y = 1;
 
-            if (square1Length == 3)
+            foreach (var square in squares)
             {
-                foreach (var square in squares)
+                for (int vertical = 0; vertical < square1Length; vertical++)
                 {
-                    newByte[x] = square[0];
-                    newByte[x + 1] = square[1];
-                    newByte[x + 2] = square[2];
-                    newByte[x + grid1Length] = square[3];
-                    newByte[x + 1 + grid1Length] = square[4];
-                    newByte[x + 2 + grid1Length] = square[5];
-                    newByte[x + 0 + 2 * grid1Length] = square[6];
-                    newByte[x + 1 + 2 * grid1Length] = square[7];
-                    newByte[x + 2 + 2 * grid1Length] = square[8];
+                    for (int horizontalMove = 0; horizontalMove < square1Length; horizontalMove++)
+                    {
+                        newByte[x + horizontalMove + (vertical * grid1Length)] = square[(horizontalMove + (vertical * square1Length))];
+                    }
                 }
-
-                if ((x + square1Length) % grid1Length == 0) { x = rowCount * y++; }
-                else { x += square1Length; };
+                if (((x + square1Length) % grid1Length) == 0) { x = rowCount * y++; } else { x += square1Length; };
             }
-            else if (square1Length == 4)
-            {
-                foreach (var square in squares)
-                {
-                    newByte[x] = square[0];
-                    newByte[x + 1] = square[1];
-                    newByte[x + 2] = square[2];
-                    newByte[x + 3] = square[3];
-                    newByte[x + grid1Length] = square[4];
-                    newByte[x + 1 + grid1Length] = square[5];
-                    newByte[x + 2 + grid1Length] = square[6];
-                    newByte[x + 3 * grid1Length] = square[7];
-                    newByte[x + 2 * grid1Length] = square[8];
-                    newByte[x + 1 + 2 * grid1Length] = square[9];
-                    newByte[x + 2 + 2 * grid1Length] = square[10];
-                    newByte[x + 3 + 2 * grid1Length] = square[11];
-                    newByte[x + 3 * grid1Length] = square[12];
-                    newByte[x + 1 + 3 * grid1Length] = square[13];
-                    newByte[x + 2 + 3 * grid1Length] = square[14];
-                    newByte[x + 3 + 3 * grid1Length] = square[15];
-                }
-
-                if ((x + square1Length) % grid1Length == 0) { x = rowCount * y++; }
-                else { x += square1Length; };
-            }
-            //TODO ADD square size 5
-            else
-            {
-                foreach (var square in squares)
-                {
-                    newByte[x] = square[0];
-                    newByte[x + 1] = square[1];
-                    newByte[x + grid1Length] = square[2];
-                    newByte[x + 1 + grid1Length] = square[3];
-                }
-
-                if ((x + square1Length) % grid1Length == 0) { x = rowCount * y++; }
-                else { x += square1Length; };
-            }
-
             return newByte;
         }
 
+        ///TODO refactor DRY
         /// <summary>
         /// Create new squares based on the total grid
         /// </summary>
@@ -162,9 +109,10 @@ namespace AdventCode2017
             var squareSize = 2;
             var square1Length = (int)System.Math.Sqrt(newSquare.Length);
             var rowCount = squareSize * square1Length;
-            if ((newSquare.Length / 2) % squareSize == 0)
+            //var testsQuareLength = (newSquare.Length / 2d) % squareSize;
+            if ((newSquare.Length / 2d) % squareSize == 0d)
             {
-                var squareAmount = System.Math.Sqrt(newSquare.Length);
+                var squareAmount = newSquare.Length / 4;
                 var x = 0;
                 var y = 1;
                 for (int i = 0; i < squareAmount; i++)
@@ -172,7 +120,7 @@ namespace AdventCode2017
                     var new2by2Square = new byte[4];
                     new2by2Square[0] = newSquare[x + 0];
                     new2by2Square[1] = newSquare[x + 1];
-                    new2by2Square[2] = newSquare[x + square1Length];
+                    new2by2Square[2] = newSquare[x + 0 + square1Length];
                     new2by2Square[3] = newSquare[x + 1 + square1Length];
                     newGrid.Add(new2by2Square);
 
@@ -183,8 +131,7 @@ namespace AdventCode2017
             else
             {
                 squareSize = 3;
-                square1Length = (int)System.Math.Sqrt(newSquare.Length);
-                var squareAmount = square1Length;
+                var squareAmount = newSquare.Length / 9;
                 rowCount = squareSize * square1Length;
                 var x = 0;
                 var y = 1;
@@ -194,10 +141,10 @@ namespace AdventCode2017
                     new2by2Square[0] = newSquare[x + 0];
                     new2by2Square[1] = newSquare[x + 1];
                     new2by2Square[2] = newSquare[x + 2];
-                    new2by2Square[3] = newSquare[x + square1Length];
+                    new2by2Square[3] = newSquare[x + 0 + square1Length];
                     new2by2Square[4] = newSquare[x + 1 + square1Length];
                     new2by2Square[5] = newSquare[x + 2 + square1Length];
-                    new2by2Square[6] = newSquare[x + square1Length * 2];
+                    new2by2Square[6] = newSquare[x + 0 + square1Length * 2];
                     new2by2Square[7] = newSquare[x + 1 + square1Length * 2];
                     new2by2Square[8] = newSquare[x + 2 + square1Length * 2];
                     newGrid.Add(new2by2Square);
@@ -369,7 +316,8 @@ namespace AdventCode2017
 
         public void CalculateAnswerB()
         {
-            new Dag18Program(0, true).CalculateAnswerB();
+            iterations = 18;
+            CalculateAnswerA();
         }
     }
 }
