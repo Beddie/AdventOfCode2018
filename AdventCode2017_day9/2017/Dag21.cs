@@ -9,6 +9,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Collections.Concurrent;
 
 namespace AdventCode2017
 {
@@ -18,159 +21,192 @@ namespace AdventCode2017
         private bool test = false;
         private string puzzleString = Resources.dag21_2017;
         private int iterations = 5;
+        private readonly ConcurrentDictionary<Bitmap, Bitmap> bitmapPatterns = new ConcurrentDictionary<Bitmap, Bitmap>();
+        private readonly ConcurrentDictionary<Bitmap, Bitmap> cachedMatches = new ConcurrentDictionary<Bitmap, Bitmap>();
+        private object lockBitmap = new object();
+
+        private byte[] startGrid => pixelStringToByteSquare(".#...####");
+
         public Dag21()
         {
             CalculateAnswerA();
-            CalculateAnswerB();
+             CalculateAnswerB();
         }
 
-        //../.# => ##./#../...
-        //.#./..#/### => #..#/..../..../#..#
+        //Test patterns
+        //      ../.# => ##./#../...
+        //      .#./..#/### => #..#/..../..../#..#"
 
-        private Dictionary<byte[], byte[]> rules = new Dictionary<byte[], byte[]>();
-        // "../.# => ##./#../...
-        //.#./..#/### => #..#/..../..../#..#"}
+        //      .#.
+        //      ..#
+        //      ###
 
         public void CalculateAnswerA()
         {
-            //.#.
-            //..#
-            //###
-            //test = false;
+            
             if (test)
             {
-                rules.Add(pixelStringToSquare("../.#"), pixelStringToSquare("##./#../..."));
-                rules.Add(pixelStringToSquare(".#./..#/###"), pixelStringToSquare("#..#/..../..../#..#"));
+                bitmapPatterns.TryAdd(pixelStringToBitmapSquare("../.#"), pixelStringToBitmapSquare("##./#../..."));
+                bitmapPatterns.TryAdd(pixelStringToBitmapSquare(".#./..#/###"), pixelStringToBitmapSquare("#..#/..../..../#..#"));
             }
             else
             {
                 foreach (var rulestring in puzzleString.Split('\n'))
                 {
                     var rule = rulestring.Replace(" ", "").Replace(">", "").Replace("\r", "").Split('=');
-                    rules.Add(pixelStringToSquare(rule[0]), pixelStringToSquare(rule[1]));
+                    bitmapPatterns.TryAdd(pixelStringToBitmapSquare(rule[0]), pixelStringToBitmapSquare(rule[1]));
                 }
             }
 
-            var startGrid = pixelStringToSquare(".#...####");
-            var gridList = new List<byte[]>();
-            var newCreatedGrid = startGrid;
-            gridList.Add(startGrid);
+            (int, List<byte[]>) gridList = (0, new List<byte[]>());
+            Bitmap newCreatedGrid = null;
+            gridList = (3, new List<byte[]>() { startGrid });
+
+            ///Iterate all divide and reunite steps. Answer A will do 5, Answer B will do 11
             for (int i = 0; i < (test ? 2 : iterations); i++)
             {
-                var newGridList = new List<byte[]>();
-                foreach (var newsq in gridList)
+                var newGridList = new List<Bitmap>();
+
+                foreach (var newsq in gridList.Item2)
                 {
-                    newGridList.Add(GetNewSquare(newsq));
+                    newGridList.Add(GetNewSquare((gridList.Item1, newsq)));
                 }
-                newCreatedGrid = Create1Grid(newGridList);
-                gridList = CreatedNewSquares(newCreatedGrid);
+                newCreatedGrid = CreateTotalGrid(newGridList);
+                var newSquares = CreatedNewSquares(newCreatedGrid);
+                gridList = newSquares;
             }
-            Debug.WriteLine($"{newCreatedGrid.Where(c => c == (byte)1).Count()}");
+            Debug.WriteLine($"{CountPattern(newCreatedGrid)}");
         }
+
 
         /// <summary>
         /// Create 1 total grid (which is one / 1 byte[]) again, to be used in new evaluation
         /// </summary>
         /// <param name="squares"></param>
         /// <returns></returns>
-        private byte[] Create1Grid(List<byte[]> squares)
+        private Bitmap CreateTotalGrid(List<Bitmap> squares)
         {
-            var squareByteSize = squares.Sum(c => c.Length);
-            var square1Length = (int)Math.Sqrt(squares.First().Length);
-            var grid1Length = (int)Math.Sqrt(squareByteSize);
-            var rowCount = square1Length * grid1Length;
-            var newByte = new byte[squareByteSize];
+            var squareByteSize = squares.Sum(c => c.Size.Height * c.Size.Width);
+            var squareStride = (int)squares.First().Width;
+            var gridStride = (int)Math.Sqrt(squareByteSize);
+            var rowCount = squareStride * gridStride;
+            var newTotalGrid = new Bitmap(gridStride, gridStride);
             int x = 0;
-            int y = 1;
+            int y = 0;
 
             foreach (var square in squares)
             {
-                for (int vertical = 0; vertical < square1Length; vertical++)
+                for (int vertical = 0; vertical < squareStride; vertical++)
                 {
-                    for (int horizontalMove = 0; horizontalMove < square1Length; horizontalMove++)
+                    for (int horizontalMove = 0; horizontalMove < squareStride; horizontalMove++)
                     {
-                        newByte[x + horizontalMove + (vertical * grid1Length)] = square[(horizontalMove + (vertical * square1Length))];
+                        var color = square.GetPixel(horizontalMove, vertical);
+                        newTotalGrid.SetPixel(x + horizontalMove, y + vertical, color);
                     }
                 }
-                if (((x + square1Length) % grid1Length) == 0) { x = rowCount * y++; } else { x += square1Length; };
+                if (((x + squareStride) % gridStride) == 0) { x = 0; y += squareStride; } else { x += squareStride; };
             }
-            return newByte;
+            return newTotalGrid;
         }
 
-        ///TODO refactor DRY
         /// <summary>
         /// Create new squares based on the total grid
         /// </summary>
-        /// <param name="newSquare"></param>
+        /// <param name="totalGrid"></param>
         /// <returns></returns>
-        private List<byte[]> CreatedNewSquares(byte[] newSquare)
+        private (int, List<byte[]>) CreatedNewSquares(Bitmap totalGrid)
         {
-            var newGrid = new List<byte[]>();
-            var squareSize = 2;
-            var square1Length = (int)System.Math.Sqrt(newSquare.Length);
-            var rowCount = squareSize * square1Length;
-            //var testsQuareLength = (newSquare.Length / 2d) % squareSize;
-            if ((newSquare.Length / 2d) % squareSize == 0d)
-            {
-                var squareAmount = newSquare.Length / 4;
-                var x = 0;
-                var y = 1;
-                for (int i = 0; i < squareAmount; i++)
-                {
-                    var new2by2Square = new byte[4];
-                    new2by2Square[0] = newSquare[x + 0];
-                    new2by2Square[1] = newSquare[x + 1];
-                    new2by2Square[2] = newSquare[x + 0 + square1Length];
-                    new2by2Square[3] = newSquare[x + 1 + square1Length];
-                    newGrid.Add(new2by2Square);
+            var newGrid = new List<Bitmap>();
+            var gridSizeLength = totalGrid.Width;
+            var squareSize = gridSizeLength % 2d == 0d ? 2 : 3;
+            var totalSquareAmount = (gridSizeLength * gridSizeLength) / (squareSize * squareSize);
+            var x = 0;
+            var y = 0;
 
-                    if ((x + squareSize) % square1Length == 0) { x = rowCount * y++; }
-                    else { x += squareSize; };
-                }
-            }
-            else
+            for (int i = 0; i < totalSquareAmount; i++)
             {
-                squareSize = 3;
-                var squareAmount = newSquare.Length / 9;
-                rowCount = squareSize * square1Length;
-                var x = 0;
-                var y = 1;
-                for (int i = 0; i < squareAmount; i++)
+                var newSquareImage = new Bitmap(squareSize, squareSize);
+                for (int vertical = 0; vertical < squareSize; vertical++)
                 {
-                    var new2by2Square = new byte[9];
-                    new2by2Square[0] = newSquare[x + 0];
-                    new2by2Square[1] = newSquare[x + 1];
-                    new2by2Square[2] = newSquare[x + 2];
-                    new2by2Square[3] = newSquare[x + 0 + square1Length];
-                    new2by2Square[4] = newSquare[x + 1 + square1Length];
-                    new2by2Square[5] = newSquare[x + 2 + square1Length];
-                    new2by2Square[6] = newSquare[x + 0 + square1Length * 2];
-                    new2by2Square[7] = newSquare[x + 1 + square1Length * 2];
-                    new2by2Square[8] = newSquare[x + 2 + square1Length * 2];
-                    newGrid.Add(new2by2Square);
-
-                    if ((x + squareSize) % square1Length == 0) { x = rowCount * y++; ; }
-                    else { x += squareSize; };
+                    for (int horizontalMove = 0; horizontalMove < squareSize; horizontalMove++)
+                    {
+                        var color = totalGrid.GetPixel(x + horizontalMove, vertical + y);
+                        newSquareImage.SetPixel(horizontalMove, vertical, color);
+                    }
                 }
+                newGrid.Add(newSquareImage);
+                if (((x + squareSize) % gridSizeLength) == 0) { x = 0; y += squareSize; } else { x += squareSize; };
             }
-            return newGrid;
+            return (squareSize, newGrid.Select(c => ImageToByte(c)).ToList());
         }
 
+        private void Print(Bitmap newSquareImage, string prefix)
+        {
+            Debug.WriteLine(prefix);
+            for (int y = 0; y < newSquareImage.Height; y++)
+            {
+                for (int x = 0; x < newSquareImage.Width; x++)
+                {
+                    var pixel = newSquareImage.GetPixel(x, y);
+                    Debug.Write(string.Format("{0}", pixel.Name.Equals("ffffffff") ? "." : "#"));
+                }
+                Debug.WriteLine("");
+            }
+            Debug.WriteLine("");
+        }
+
+
+        private static object lockDictionaryBitmap = new object();
         /// <summary>
         /// Return compared value or if not found, return item1 = false
         /// </summary>
         /// <param name="square"></param>
         /// <returns></returns>
-        private (bool, byte[]) isEqualCompare(byte[] square)
+        private (bool, Bitmap) isEqualCompare(Bitmap square)
         {
-            foreach (var rule in rules)
+            if (cachedMatches.TryGetValue(square, out Bitmap retVal))
             {
-                if (rule.Key.SequenceEqual(square))
+                return (true, retVal);
+            }
+
+            var retTuple = (false, (Bitmap)null);
+            Parallel.ForEach(bitmapPatterns, (rule) =>
+            {
+                if (CompareBitmapsFast(rule.Key, square))
                 {
-                    return (true, rule.Value);
+                    cachedMatches.TryAdd(square, rule.Value);
+                    retTuple = (true, rule.Value);
+                }
+            });
+            return retTuple;
+        }
+
+
+        public bool CompareBitmapsFast(Bitmap bmp1, Bitmap bmp2)
+        {
+            byte[] arr1;
+            byte[] arr2;
+            lock (lockBitmap)
+            {
+                arr1 = ImageToByte(bmp1);
+                arr2 = ImageToByte(bmp2);
+            }
+            return arr1.SequenceEqual(arr2);
+        }
+
+        public int CountPattern(Bitmap bmp1)
+        {
+            Print(bmp1, "Final Result");
+            var count = 0;
+            for (int y = 0; y < bmp1.Height; y++)
+            {
+                for (int x = 0; x < bmp1.Width; x++)
+                {
+                    var pixel = bmp1.GetPixel(x, y);
+                    if (!pixel.Name.Equals("ffffffff")) count++;
                 }
             }
-            return (false, null);
+            return count;
         }
 
         /// <summary>
@@ -178,123 +214,39 @@ namespace AdventCode2017
         /// </summary>
         /// <param name="square"></param>
         /// <returns></returns>
-        private byte[] GetNewSquare(byte[] square)
+        private Bitmap GetNewSquare((int, byte[]) squareByte)
         {
+            //Convert from bytearray to Bitmap
+            var squareImage = CopyDataToBitmap(squareByte);
             for (int i = 0; i < 4; i++)
             {
-                var isEqual = isEqualCompare(square);
+                var isEqual = isEqualCompare(squareImage);
                 if (isEqual.Item1) return isEqual.Item2;
-                Rotate(ref square);
+                squareImage.RotateFlip(RotateFlipType.Rotate90FlipNone); // Rotate(ref square);
             }
-            FlipX(ref square);
+            squareImage.RotateFlip(RotateFlipType.RotateNoneFlipX);
             for (int i = 0; i < 4; i++)
             {
-                var isEqual = isEqualCompare(square);
+                var isEqual = isEqualCompare(squareImage);
                 if (isEqual.Item1) return isEqual.Item2;
-                Rotate(ref square);
+                squareImage.RotateFlip(RotateFlipType.Rotate90FlipNone); // Rotate(ref square);
             }
-            FlipX(ref square);
-            FlipY(ref square);
-            for (int i = 0; i < 4; i++)
-            {
-                var isEqual = isEqualCompare(square);
-                if (isEqual.Item1) return isEqual.Item2;
-                Rotate(ref square);
-            }
-            return null;
+            throw new KeyNotFoundException("Output square is not found after rotating and flipping original square");
         }
 
-        /// <summary>
-        /// Flip squares X-as
-        /// </summary>
-        /// <param name="square"></param>
-        private void FlipX(ref byte[] square)
+
+        public Bitmap CopyDataToBitmap((int, byte[]) data)
         {
-            var rs = new byte[square.Length];
-
-            switch (square.Length)
-            {
-                case 9:
-                    rs[0] = square[2];
-                    rs[1] = square[1];
-                    rs[2] = square[0];
-                    rs[3] = square[5];
-                    rs[4] = square[4];
-                    rs[5] = square[3];
-                    rs[6] = square[8];
-                    rs[7] = square[7];
-                    rs[8] = square[6];
-                    break;
-                default:
-                    rs[0] = square[1];
-                    rs[1] = square[0];
-                    rs[2] = square[3];
-                    rs[3] = square[2];
-                    break;
-            }
-            square = rs;
-        }
-
-        /// <summary>
-        /// Flip squares Y-as
-        /// </summary>
-        /// <param name="square"></param>
-        private void FlipY(ref byte[] square)
-        {
-            var rs = new byte[square.Length];
-
-            switch (square.Length)
-            {
-                case 9:
-                    rs[0] = square[6];
-                    rs[1] = square[7];
-                    rs[2] = square[8];
-                    rs[3] = square[3];
-                    rs[4] = square[4];
-                    rs[5] = square[5];
-                    rs[6] = square[0];
-                    rs[7] = square[1];
-                    rs[8] = square[2];
-                    break;
-                default:
-                    rs[0] = square[2];
-                    rs[1] = square[3];
-                    rs[2] = square[0];
-                    rs[3] = square[1];
-                    break;
-            }
-            square = rs;
-        }
-
-        /// <summary>
-        /// Rotate Square
-        /// </summary>
-        /// <param name="square"></param>
-        private void Rotate(ref byte[] square)
-        {
-            var rs = new byte[square.Length];
-
-            switch (square.Length)
-            {
-                case 9:
-                    rs[0] = square[6];
-                    rs[1] = square[3];
-                    rs[2] = square[0];
-                    rs[3] = square[7];
-                    rs[4] = square[4];
-                    rs[5] = square[1];
-                    rs[6] = square[8];
-                    rs[7] = square[5];
-                    rs[8] = square[2];
-                    break;
-                default:
-                    rs[0] = square[2];
-                    rs[1] = square[0];
-                    rs[2] = square[3];
-                    rs[3] = square[1];
-                    break;
-            }
-            square = rs;
+            //Here create the Bitmap to the know height, width and format
+            Bitmap bmp = new Bitmap(data.Item1, data.Item1);
+            //Create a BitmapData and Lock all pixels to be written 
+            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.WriteOnly, bmp.PixelFormat);
+            //Copy the data from the byte array into BitmapData.Scan0
+            Marshal.Copy(data.Item2, 0, bmpData.Scan0, data.Item2.Length);
+            //Unlock the pixels
+            bmp.UnlockBits(bmpData);
+            //Return the bitmap 
+            return bmp;
         }
 
         /// <summary>
@@ -302,16 +254,59 @@ namespace AdventCode2017
         /// </summary>
         /// <param name="pixels"></param>
         /// <returns></returns>
-        private byte[] pixelStringToSquare(string pixels)
+        private byte[] pixelStringToByteSquare(string pixels)
         {
             pixels = pixels.Replace("/", "");
-            var pixelbytes = new byte[pixels.Length];
-            var i = 0;
-            foreach (var chartic in pixels)
+            int amount = pixels.Count();
+            int stride = (int)Math.Sqrt(amount);
+            var newImage = new Bitmap(stride, stride);
+            var charCount = 0;
+            for (int y = 0; y < stride; y++)
             {
-                pixelbytes[i++] = chartic == '#' ? (byte)1 : (byte)0;
+                for (int x = 0; x < stride; x++)
+                {
+                    newImage.SetPixel(x, y, pixels[charCount++] == '.' ? Color.White : Color.Black);
+
+                }
             }
-            return pixelbytes;
+            return ImageToByte(newImage);
+        }
+
+        private Bitmap pixelStringToBitmapSquare(string pixels)
+        {
+            pixels = pixels.Replace("/", "");
+            int amount = pixels.Count();
+            int stride = (int)Math.Sqrt(amount);
+            var newImage = new Bitmap(stride, stride);
+            var charCount = 0;
+            for (int y = 0; y < stride; y++)
+            {
+                for (int x = 0; x < stride; x++)
+                {
+                    newImage.SetPixel(x, y, pixels[charCount++] == '.' ? Color.White : Color.Black);
+
+                }
+            }
+            return newImage;
+        }
+
+        public static byte[] ImageToByte(Bitmap bitmap)
+        {
+            BitmapData bmpdata = null;
+            try
+            {
+                bmpdata = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, bitmap.PixelFormat);
+                int numbytes = bmpdata.Stride * bitmap.Height;
+                byte[] bytedata = new byte[numbytes];
+                IntPtr ptr = bmpdata.Scan0;
+                Marshal.Copy(ptr, bytedata, 0, numbytes);
+                return bytedata;
+            }
+            finally
+            {
+                if (bmpdata != null)
+                    bitmap.UnlockBits(bmpdata);
+            }
         }
 
         public void CalculateAnswerB()
