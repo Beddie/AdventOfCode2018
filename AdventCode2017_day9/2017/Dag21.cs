@@ -22,7 +22,7 @@ namespace AdventCode2017
         private string puzzleString = Resources.dag21_2017;
         private int iterations = 5;
         private readonly ConcurrentDictionary<Bitmap, Bitmap> bitmapPatterns = new ConcurrentDictionary<Bitmap, Bitmap>();
-        private readonly ConcurrentDictionary<Bitmap, Bitmap> cachedMatches = new ConcurrentDictionary<Bitmap, Bitmap>();
+        private readonly Dictionary<byte[], Bitmap> cachedMatches = new Dictionary<byte[], Bitmap>();
         private object lockBitmap = new object();
 
         private byte[] startGrid => pixelStringToByteSquare(".#...####");
@@ -74,8 +74,16 @@ namespace AdventCode2017
                 newCreatedGrid = CreateTotalGrid(newGridList);
                 var newSquares = CreatedNewSquares(newCreatedGrid);
                 gridList = newSquares;
+
+                //Task.Run(() => PrintDebugMessage(newCreatedGrid, i));
             }
             Debug.WriteLine($"{CountPattern(newCreatedGrid)}");
+        }
+
+        static async Task PrintDebugMessage(Bitmap bmp, int i)
+        {
+            await Task.Delay(1000);
+            await Task.Run(() => Print(bmp, $"iteration {i}"));
         }
 
 
@@ -140,19 +148,23 @@ namespace AdventCode2017
             return (squareSize, newGrid.Select(c => ImageToByte(c)).ToList());
         }
 
-        private void Print(Bitmap newSquareImage, string prefix)
+
+        private static void Print(Bitmap newSquareImage, string prefix)
         {
-            Debug.WriteLine(prefix);
+
+            var printstring = new StringBuilder();
+            printstring.AppendLine(prefix);
             for (int y = 0; y < newSquareImage.Height; y++)
             {
                 for (int x = 0; x < newSquareImage.Width; x++)
                 {
                     var pixel = newSquareImage.GetPixel(x, y);
-                    Debug.Write(string.Format("{0}", pixel.Name.Equals("ffffffff") ? "." : "#"));
+                    printstring.Append(string.Format("{0}", pixel.Name.Equals("ffffffff") ? "." : "#"));
                 }
-                Debug.WriteLine("");
+                printstring.AppendLine("");
             }
-            Debug.WriteLine("");
+            printstring.AppendLine();
+            Debug.Print(printstring.ToString());
         }
 
 
@@ -164,32 +176,47 @@ namespace AdventCode2017
         /// <returns></returns>
         private (bool, Bitmap) isEqualCompare(Bitmap square)
         {
-            if (cachedMatches.TryGetValue(square, out Bitmap retVal))
+
+            var arr1 = ImageToByte(square);
+            var matchedCachedImage = cachedMatches.Where(c => arr1.SequenceEqual(c.Key)).Any();
+            if (matchedCachedImage)
             {
-                return (true, retVal);
+                var retv = cachedMatches.Where(c => arr1.SequenceEqual(c.Key)).Select(c => c.Value).Single();
+                return (true, retv);
             }
 
             var retTuple = (false, (Bitmap)null);
-            Parallel.ForEach(bitmapPatterns, (rule) =>
+            //byte[] matchArr = null;
+
+            foreach (var rule in bitmapPatterns.Where(c => c.Key.Width == square.Width))
             {
-                if (CompareBitmapsFast(rule.Key, square))
+
+
+                // Parallel.ForEach(bitmapPatterns.Where(c=> c.Key.Width == square.Width), (rule) =>
+                //{
+                if (CompareBitmapsFast(rule.Key, arr1))
                 {
-                    cachedMatches.TryAdd(square, rule.Value);
+                   // matchArr = ImageToByte(rule.Key);
                     retTuple = (true, rule.Value);
                 }
-            });
+                // });
+            }
+            if (retTuple.Item1 && !matchedCachedImage)
+            {
+                cachedMatches.Add(arr1, retTuple.Item2);
+            }
             return retTuple;
         }
 
 
-        public bool CompareBitmapsFast(Bitmap bmp1, Bitmap bmp2)
+        public bool CompareBitmapsFast(Bitmap bmp1, byte[] arr2)
         {
             byte[] arr1;
-            byte[] arr2;
+            //byte[] arr2;
             lock (lockBitmap)
             {
                 arr1 = ImageToByte(bmp1);
-                arr2 = ImageToByte(bmp2);
+              //  arr2 = ImageToByte(bmp2);
             }
             return arr1.SequenceEqual(arr2);
         }
@@ -216,24 +243,47 @@ namespace AdventCode2017
         /// <returns></returns>
         private Bitmap GetNewSquare((int, byte[]) squareByte)
         {
+            var matchedCachedImage = cachedMatches.Where(c => squareByte.Item2.SequenceEqual(c.Key)).Any();
+            if (matchedCachedImage)
+            {
+                return cachedMatches.Where(c => squareByte.Item2.SequenceEqual(c.Key)).Select(c => c.Value).Single();
+            }
+
+
             //Convert from bytearray to Bitmap
             var squareImage = CopyDataToBitmap(squareByte);
             for (int i = 0; i < 4; i++)
             {
                 var isEqual = isEqualCompare(squareImage);
-                if (isEqual.Item1) return isEqual.Item2;
+                if (isEqual.Item1)
+                {
+                    CacheOriginalByte(squareByte.Item2, isEqual.Item2);
+                    return isEqual.Item2;
+                }
                 squareImage.RotateFlip(RotateFlipType.Rotate90FlipNone); // Rotate(ref square);
             }
             squareImage.RotateFlip(RotateFlipType.RotateNoneFlipX);
             for (int i = 0; i < 4; i++)
             {
                 var isEqual = isEqualCompare(squareImage);
-                if (isEqual.Item1) return isEqual.Item2;
+                if (isEqual.Item1)
+                {
+                    CacheOriginalByte(squareByte.Item2, isEqual.Item2);
+                    return isEqual.Item2;
+                }
                 squareImage.RotateFlip(RotateFlipType.Rotate90FlipNone); // Rotate(ref square);
             }
             throw new KeyNotFoundException("Output square is not found after rotating and flipping original square");
         }
 
+        private void CacheOriginalByte(byte[] squareByte, Bitmap item2)
+        {
+            var saveMatchedNotExistingCachedImage = !cachedMatches.Where(c => squareByte.SequenceEqual(c.Key)).Any();
+            if (saveMatchedNotExistingCachedImage)
+            {
+                cachedMatches.Add(squareByte, item2);
+            }
+        }
 
         public Bitmap CopyDataToBitmap((int, byte[]) data)
         {
