@@ -4,7 +4,7 @@
     {
         static void Main(string[] args)
         {
-            var day21 = new Dag21();
+            var day22 = new Dag22();
         }
 
     }
