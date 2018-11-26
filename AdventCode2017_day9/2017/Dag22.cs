@@ -1,11 +1,22 @@
 ﻿using AdventCode;
 using AdventCode.Properties;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 
 namespace AdventCode2017
 {
+    public static class LocalizationMarketExtensions
+    {
+
+    }
+
+
+
+
     public class Dag22 : AdventBase, AdventInterface
     {
         private bool test = false;
@@ -18,13 +29,34 @@ namespace AdventCode2017
 
         private byte[] startGrid;
 
+        [Flags]
         private enum Direction
         {
             Left = 1
             , Right = 2
             , Up = 3
             , Down = 4
+            , Reverse = 5
+            , Forward = 6
         }
+
+        [Flags]
+        private enum VirusStatus
+        {
+            [Description(".")]
+            Clean = 0,
+            [Description("W")]
+            Weakened = 1,
+            [Description("#")]
+            Infected = 3,
+            [Description("F")]
+            Flagged = 4,
+            [Description("X")]
+            unKnown = 5
+        }
+
+        public static Dictionary<int, string> VirusStatusHelper = EnumDictionary<VirusStatus>();
+
 
         public void CalculateAnswerA()
         {
@@ -38,7 +70,8 @@ namespace AdventCode2017
             }
 
             //Build big Grid around startgrid
-            var gridMapStride = test ? 1000 : 1000;
+            var gridMapStride = test ? 10
+                : 1000;
             var gridMap = new byte[gridMapStride * gridMapStride];
             var gridMapMiddle = (int)(gridMapStride / 2d);
             var startGridStride = (int)Math.Sqrt(startGrid.Length);
@@ -62,38 +95,78 @@ namespace AdventCode2017
                     }
                     else
                     {
-                        gridMap[gridPosition] = 0;
+                        gridMap[gridPosition] = (byte)VirusStatus.Clean;
                     }
                 }
             }
 
             //Walk grid
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 10000000; i++)
             {
                 position.nodeValue = gridMap[position.currentPostition];
-                gridMap[position.currentPostition] = position.NewNodeValue;
+                gridMap[position.currentPostition] = (byte)position.NewNodeStatus;
                 position.Move();
             }
-            Print(gridMap, gridMapStride, gridMapMiddle, position);
+                Print(gridMap, gridMapStride, gridMapMiddle, position);
 
             Debug.WriteLine($"Number of nodes being infected: {position.countInfectionCaused}");
         }
 
         private class Virus
         {
-            public Virus(int Stride, int CurrentPostition)
+
+            public Virus(int _stride, int _currentPostition)
             {
-                stride = Stride;
-                currentPostition = CurrentPostition;
+                stride = _stride;
+                currentPostition = _currentPostition;
             }
             public byte nodeValue { get; set; }
             public int countInfectionCaused { get; set; }
             public int currentPostition { get; set; }
-
+            private VirusStatus status => (VirusStatus)nodeValue;
             private Direction vector { get; set; } = Direction.Up;
             private int stride { get; set; }
-            private Direction directionBasedOnValue { get { return isNotInfected ? Direction.Left : Direction.Right; } }
-            private bool isNotInfected => nodeValue == 0;
+            private Direction directionBasedOnValue
+            {
+                get
+                {
+                    switch (status)
+                    {
+                        case VirusStatus.Clean:
+                            return Direction.Left;
+                        case VirusStatus.Weakened:
+                            return Direction.Forward;
+                        case VirusStatus.Infected:
+                            return Direction.Right;
+                        case VirusStatus.Flagged:
+                            return Direction.Reverse;
+                        default:
+                            throw new NotSupportedException();
+                    }
+                }
+            }
+
+            private void MovePositionBasedOnDirection(Direction direction) {
+
+                switch (direction)
+                {
+                    case Direction.Left:
+                        currentPostition--; vector = Direction.Left;
+                        break;
+                    case Direction.Right:
+                        currentPostition++; vector = Direction.Right;
+                        break;
+                    case Direction.Up:
+                        currentPostition = currentPostition - stride; vector = Direction.Up;
+                        break;
+                    case Direction.Down:
+                        currentPostition = currentPostition + stride; vector = Direction.Down;
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+            private void MoveRight() => currentPostition++;
 
             public void Move()
             {
@@ -101,36 +174,53 @@ namespace AdventCode2017
                 switch (vector)
                 {
                     case Direction.Left:
-                        if (newDirection == Direction.Left) { currentPostition = currentPostition + stride; vector = Direction.Down; }
-                        if (newDirection == Direction.Right) { currentPostition = currentPostition - stride; vector = Direction.Up; }
+                        if (newDirection == Direction.Left) { MovePositionBasedOnDirection(Direction.Down); }
+                        if (newDirection == Direction.Right) { MovePositionBasedOnDirection(Direction.Up); }
+                        if (newDirection == Direction.Reverse) { MovePositionBasedOnDirection(Direction.Right); }
+                        if (newDirection == Direction.Forward) { MovePositionBasedOnDirection(Direction.Left); }
                         break;
                     case Direction.Right:
-                        if (newDirection == Direction.Left) { currentPostition = currentPostition - stride; vector = Direction.Up; }
-                        if (newDirection == Direction.Right) { currentPostition = currentPostition + stride; vector = Direction.Down; }
+                        if (newDirection == Direction.Left) { MovePositionBasedOnDirection(Direction.Up); }
+                        if (newDirection == Direction.Right) { MovePositionBasedOnDirection(Direction.Down); }
+                        if (newDirection == Direction.Reverse) { MovePositionBasedOnDirection(Direction.Left); }
+                        if (newDirection == Direction.Forward) { MovePositionBasedOnDirection(Direction.Right); }
                         break;
                     case Direction.Up:
-                        if (newDirection == Direction.Left) { currentPostition--; vector = Direction.Left; }
-                        if (newDirection == Direction.Right) { currentPostition++; vector = Direction.Right; }
+                        if (newDirection == Direction.Left) { MovePositionBasedOnDirection(Direction.Left); }
+                        if (newDirection == Direction.Right) { MovePositionBasedOnDirection(Direction.Right); }
+                        if (newDirection == Direction.Reverse) { MovePositionBasedOnDirection(Direction.Down); }
+                        if (newDirection == Direction.Forward) { MovePositionBasedOnDirection(Direction.Up); }
                         break;
                     case Direction.Down:
-                        if (newDirection == Direction.Left) { currentPostition++; vector = Direction.Right; }
-                        if (newDirection == Direction.Right) { currentPostition--; vector = Direction.Left; }
+                        if (newDirection == Direction.Left) { MovePositionBasedOnDirection(Direction.Right); }
+                        if (newDirection == Direction.Right) { MovePositionBasedOnDirection(Direction.Left); }
+                        if (newDirection == Direction.Reverse) { MovePositionBasedOnDirection(Direction.Up); }
+                        if (newDirection == Direction.Forward) { MovePositionBasedOnDirection(Direction.Down); }
                         break;
+                   
                     default:
-                        break;
+                        throw new NotSupportedException();
                 }
             }
 
-            public byte NewNodeValue
+            public VirusStatus NewNodeStatus
             {
                 get
                 {
-                    if (isNotInfected)
+                    switch (status)
                     {
-                        countInfectionCaused++;
-                        return 1;
+                        case VirusStatus.Clean:
+                            return VirusStatus.Weakened;
+                        case VirusStatus.Weakened:
+                            countInfectionCaused++;
+                            return VirusStatus.Infected;
+                        case VirusStatus.Infected:
+                            return VirusStatus.Flagged;
+                        case VirusStatus.Flagged:
+                            return VirusStatus.Clean;
+                        default:
+                            throw new NotSupportedException();
                     }
-                    else { return 0; }
                 }
             }
         }
@@ -147,11 +237,11 @@ namespace AdventCode2017
                     if (position == postition.currentPostition)
                     {
                         printstring.Remove(printstring.Length - 1, 1);
-                        printstring.Append(string.Format("[{0}]", value == 0 ? "." : "#"));
+                        printstring.Append(string.Format("[{0}]", VirusStatusHelper[value]));
                     }
                     else
                     {
-                        printstring.Append(string.Format("{0} ", value == 0 ? "." : "#"));
+                        printstring.Append(string.Format("{0} ", VirusStatusHelper[value]));
                     }
                 }
                 printstring.AppendLine("");
@@ -159,6 +249,9 @@ namespace AdventCode2017
             printstring.AppendLine();
             Debug.Print(printstring.ToString());
         }
+
+
+
 
         /// <summary>
         /// Convert from # and . string (puzzleString) to a byte[]
@@ -172,7 +265,7 @@ namespace AdventCode2017
             var i = 0;
             foreach (var chartic in pixels)
             {
-                pixelbytes[i++] = chartic == '#' ? (byte)1 : (byte)0;
+                pixelbytes[i++] = chartic == '#' ? (byte)VirusStatus.Infected : (byte)VirusStatus.Clean;
             }
             return pixelbytes;
         }

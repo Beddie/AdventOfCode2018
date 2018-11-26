@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AdventCode.Enum;
+using AdventCode.GeneralEnums;
 
 namespace AdventCode
 {
