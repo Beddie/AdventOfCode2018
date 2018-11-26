@@ -9,14 +9,6 @@ using System.Text;
 
 namespace AdventCode2017
 {
-    public static class LocalizationMarketExtensions
-    {
-
-    }
-
-
-
-
     public class Dag22 : AdventBase, AdventInterface
     {
         private bool test = false;
@@ -250,9 +242,6 @@ namespace AdventCode2017
             Debug.Print(printstring.ToString());
         }
 
-
-
-
         /// <summary>
         /// Convert from # and . string (puzzleString) to a byte[]
         /// </summary>
@@ -272,7 +261,7 @@ namespace AdventCode2017
 
         public void CalculateAnswerB()
         {
-            //CalculateAnswerA();
+            CalculateAnswerA();
         }
     }
 }

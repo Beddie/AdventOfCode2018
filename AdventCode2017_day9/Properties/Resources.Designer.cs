@@ -294,6 +294,46 @@ namespace AdventCode.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to set b 65
+        ///set c b
+        ///jnz a 2
+        ///jnz 1 5
+        ///mul b 100
+        ///sub b -100000
+        ///set c b
+        ///sub c -17000
+        ///set f 1
+        ///set d 2
+        ///set e 2
+        ///set g d
+        ///mul g e
+        ///sub g b
+        ///jnz g 2
+        ///set f 0
+        ///sub e -1
+        ///set g e
+        ///sub g b
+        ///jnz g -8
+        ///sub d -1
+        ///set g d
+        ///sub g b
+        ///jnz g -13
+        ///jnz f 2
+        ///sub h -1
+        ///set g b
+        ///sub g c
+        ///jnz g 2
+        ///jnz 1 3
+        ///sub b -17
+        ///jnz 1 -23.
+        /// </summary>
+        internal static string dag23_2017 {
+            get {
+                return ResourceManager.GetString("dag23_2017", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {{{{{{{{&lt;!!!&gt;!&gt;!!oiau!&gt;}}&lt;u!!!!,!!,e!!!&gt;&apos;&gt;}},{}}},{{{{},{}},{{&lt;&lt;&lt;&quot;!!!&gt;!!,,}!!!&gt;&apos;&gt;}},{&lt;!!{e&apos;a!!u!!u!!!!!oa&apos;!!u!&gt;!!eu!!!!!&gt;,&lt;!&gt;},&lt;,&gt;,&lt;}{!!u,!!!&gt;},&lt;!!!&gt;!!!&gt;&gt;}},{{&lt;!}aa!!{&apos;a!&gt;},&lt;!&gt;,&lt;!&gt;!&gt;,&lt;!u,&quot;aae!&gt;},&lt;&gt;,&lt;!!!&gt;!&gt;u,o!&gt;},&lt;!!!&gt;!!!&gt;,&lt;&quot;&lt;&apos;&gt;},{{&lt;,!&gt;},&lt;ae{&gt;},&lt;&lt;e!&gt;},&lt;a!!},}&gt;}},{{&lt;&gt;,{&lt;!!!&gt;!&gt;{!&gt;},&lt;!!!!!&gt;},&lt;!&gt;},&lt;!!!&gt;,&lt;!&gt;,&lt;!!o,&lt;,&gt;}},{&lt;{&apos;&gt;,{{&lt;&quot;{,&lt;!!!&gt;!&gt;!!!&gt;u!&gt;},&lt;ue!!!!u!!&apos;uua}!!!&gt;},&lt;&gt;}}},{&lt;&apos;e!!&gt;}}},{{{{},&lt;!&gt;},&lt;!!o&quot;&apos;!&gt;,&lt;u&quot;&lt;!!&lt;,o{&apos;a&gt;},{{}},{{},{{&lt;&apos;!!i&lt;&gt;},&lt;&quot;!!!!,!&gt;{{&gt;},{&lt;i&apos;&lt;{i&gt;}}},{{{&lt;!!o!!a!!&apos;!&gt;&apos;&gt;},&lt;eu!&gt;!}&quot;!&gt;,&lt;}i&gt;},{{&lt;!&gt;},&lt;oe!&gt;}, [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string dag9_2017 {

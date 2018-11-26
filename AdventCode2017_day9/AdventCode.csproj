@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="2017\Dag10T.cs" />
+    <Compile Include="2017\Dag23.cs" />
     <Compile Include="2017\Dag22.cs" />
     <Compile Include="2017\Dag21.cs" />
     <Compile Include="2017\Dag18b.cs" />
