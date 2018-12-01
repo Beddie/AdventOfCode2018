@@ -52,6 +52,7 @@ namespace AdventCode2017
             while (indexA < DuetPairsA.Count())
             {
                 counter++;
+                counter++;
                 var currentDuet = DuetPairsA[indexA];
                 indexA = currentDuet.Item2.DuetAction(VariablesA, indexA);
                 indexA++;

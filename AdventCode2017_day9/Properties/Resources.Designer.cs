@@ -334,6 +334,86 @@ namespace AdventCode.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 31/13
+        ///34/4
+        ///49/49
+        ///23/37
+        ///47/45
+        ///32/4
+        ///12/35
+        ///37/30
+        ///41/48
+        ///0/47
+        ///32/30
+        ///12/5
+        ///37/31
+        ///7/41
+        ///10/28
+        ///35/4
+        ///28/35
+        ///20/29
+        ///32/20
+        ///31/43
+        ///48/14
+        ///10/11
+        ///27/6
+        ///9/24
+        ///8/28
+        ///45/48
+        ///8/1
+        ///16/19
+        ///45/45
+        ///0/4
+        ///29/33
+        ///2/5
+        ///33/9
+        ///11/7
+        ///32/10
+        ///44/1
+        ///40/32
+        ///2/45
+        ///16/16
+        ///1/18
+        ///38/36
+        ///34/24
+        ///39/44
+        ///32/37
+        ///26/46
+        ///25/33
+        ///9/10
+        ///0/29
+        ///38/8
+        ///33/33
+        ///49/19
+        ///18/20
+        ///49/39
+        ///18/39
+        ///26/13
+        ///19/32.
+        /// </summary>
+        internal static string dag24_2017 {
+            get {
+                return ResourceManager.GetString("dag24_2017", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 0/2
+        ///2/2
+        ///2/3
+        ///3/4
+        ///3/5
+        ///0/1
+        ///10/1
+        ///9/10.
+        /// </summary>
+        internal static string dag24_2017_test {
+            get {
+                return ResourceManager.GetString("dag24_2017_test", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {{{{{{{{&lt;!!!&gt;!&gt;!!oiau!&gt;}}&lt;u!!!!,!!,e!!!&gt;&apos;&gt;}},{}}},{{{{},{}},{{&lt;&lt;&lt;&quot;!!!&gt;!!,,}!!!&gt;&apos;&gt;}},{&lt;!!{e&apos;a!!u!!u!!!!!oa&apos;!!u!&gt;!!eu!!!!!&gt;,&lt;!&gt;},&lt;,&gt;,&lt;}{!!u,!!!&gt;},&lt;!!!&gt;!!!&gt;&gt;}},{{&lt;!}aa!!{&apos;a!&gt;},&lt;!&gt;,&lt;!&gt;!&gt;,&lt;!u,&quot;aae!&gt;},&lt;&gt;,&lt;!!!&gt;!&gt;u,o!&gt;},&lt;!!!&gt;!!!&gt;,&lt;&quot;&lt;&apos;&gt;},{{&lt;,!&gt;},&lt;ae{&gt;},&lt;&lt;e!&gt;},&lt;a!!},}&gt;}},{{&lt;&gt;,{&lt;!!!&gt;!&gt;{!&gt;},&lt;!!!!!&gt;},&lt;!&gt;},&lt;!!!&gt;,&lt;!&gt;,&lt;!!o,&lt;,&gt;}},{&lt;{&apos;&gt;,{{&lt;&quot;{,&lt;!!!&gt;!&gt;!!!&gt;u!&gt;},&lt;ue!!!!u!!&apos;uua}!!!&gt;},&lt;&gt;}}},{&lt;&apos;e!!&gt;}}},{{{{},&lt;!&gt;},&lt;!!o&quot;&apos;!&gt;,&lt;u&quot;&lt;!!&lt;,o{&apos;a&gt;},{{}},{{},{{&lt;&apos;!!i&lt;&gt;},&lt;&quot;!!!!,!&gt;{{&gt;},{&lt;i&apos;&lt;{i&gt;}}},{{{&lt;!!o!!a!!&apos;!&gt;&apos;&gt;},&lt;eu!&gt;!}&quot;!&gt;,&lt;}i&gt;},{{&lt;!&gt;},&lt;oe!&gt;}, [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string dag9_2017 {
