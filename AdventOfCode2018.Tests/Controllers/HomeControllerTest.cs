@@ -15,7 +15,7 @@ namespace AdventOfCode2018.Tests.Controllers
             var averageRunTime = new HashSet<long>();
 
             //Execute puzzle 100 times
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 var sw = new Stopwatch();
                 sw.Start();

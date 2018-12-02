@@ -52,28 +52,27 @@ namespace Logic.Days
         public string Part2()
         {
             var boxIDs = PuzzleInput.Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.ToCharArray()).ToHashSet();
-            var numberOfChar = boxIDs.First().Count();
+            var numberOfMatchingChars = boxIDs.First().Count() - 1;
 
             var returnstring = string.Empty;
-            Parallel.ForEach(boxIDs, (box, loopState) =>
-            {
-                var matchList = new List<char[]>();
-                //Build matchlist positionbased on equal chars
-                for (int i = 0; i < numberOfChar; i++) matchList.AddRange(boxIDs.Where(c => c != box && c[i] == box[i]));
-
-                //Count number of occurences, and is matched when equal chars = 25
-                var match = matchList.Where(c => c != box).GroupBy(c => c).Select(c => new { count = c.Count(), arr = c.First() }).Where(d => d.count == numberOfChar - 1).FirstOrDefault();
-                if (match != null)
+            Parallel.ForEach(boxIDs, (box, loopState) => Parallel.ForEach(boxIDs, (matchBox, loopState2) =>
                 {
-                    lock (lockLoop)
+                    var boxIDBuilder = new StringBuilder();
+                    if (matchBox != box)
                     {
-                        var boxIDBuilder = new StringBuilder();
-                        for (int i = 0; i < box.Length; i++) if (box[i] == match.arr[i]) boxIDBuilder.Append(box[i]);
-                        returnstring = boxIDBuilder.ToString();
-                        loopState.Break();
+                        for (int i = 0; i < box.Length; i++) if (box[i] == matchBox[i]) boxIDBuilder.Append(box[i]);
+                        if (boxIDBuilder.Length == numberOfMatchingChars)
+                        {
+                            lock (lockLoop)
+                            {
+                                returnstring = boxIDBuilder.ToString();
+                                loopState.Stop();
+                                loopState2.Stop();
+                            }
+                        }
                     }
-                }
-            });
+                    boxIDBuilder.Clear();
+                }));
             return returnstring;
         }
     }
