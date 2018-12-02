@@ -2,7 +2,7 @@
 {
     public interface AdventInterface
     {
-        string[] GetSolutions();
+        string[] Solution();
         string Part1();
         string Part2();
     }

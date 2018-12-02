@@ -13,7 +13,7 @@ namespace Logic.Days
             PuzzleInput = Resources.Day1;
         }
 
-        public string[] GetSolutions()
+        public string[] Solution()
         {
             return new string[] {
                 "576",

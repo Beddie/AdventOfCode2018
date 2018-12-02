@@ -178,5 +178,32 @@ namespace Logic.Properties {
                 return ResourceManager.GetString("Day1", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to uosnxmfkezbojfdgwvrtaqhluy
+        ///iosnxmfkazbcopdgnvrtaqhluy
+        ///ioanxmfkezbcjpdgwvrjaohluy
+        ///uosnxmfkezbcjpjgwvrtaqhlut
+        ///imsnxmfkezbcjpugwvataqhluy
+        ///ioenxmfkezbcjpdgwvrraqhluz
+        ///iosnxmfkezbcjpdgevitnqhluy
+        ///iosnxmfkezcccpdgcvrtaqhluy
+        ///loinxmfkezbcjpdgwvrtaqhluu
+        ///iosnlmfkezbczndgwvrtaqhluy
+        ///iosnxmfkezbcjpdgwvrifghluy
+        ///iosnuhfkezbcjpugwvrtaqhluy
+        ///iosnxmfkezbcwpdgwvrtaihlgy
+        ///iosnxzfwuzbcjpdgwvrtaqhluy
+        ///hosnxmfjizbcjpdgwvrtaqhluy
+        ///iornxmfktzbcjpdgwvrtaqhluo
+        ///nosnxmfkdzbcjpdgwvrtaqhlwy
+        ///iosnxmfkezbcjpdgwvrtaktluq
+        ///ioszxmlk [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Day2 {
+            get {
+                return ResourceManager.GetString("Day2", resourceCulture);
+            }
+        }
     }
 }
