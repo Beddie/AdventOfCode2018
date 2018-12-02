@@ -54,13 +54,8 @@ namespace Logic.Days
             var boxIDs = PuzzleInput.Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.ToCharArray()).ToHashSet();
             var numberOfChar = boxIDs.First().Count();
 
-            CancellationTokenSource cts = new CancellationTokenSource();
-            ParallelOptions po = new ParallelOptions();
-            po.CancellationToken = cts.Token;
-            po.MaxDegreeOfParallelism = Environment.ProcessorCount;
-
             var returnstring = string.Empty;
-            Parallel.ForEach(boxIDs, po, (box, loopState) =>
+            Parallel.ForEach(boxIDs, (box, loopState) =>
             {
                 var matchList = new List<char[]>();
                 //Build matchlist positionbased on equal chars
