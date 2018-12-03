@@ -44,28 +44,38 @@ namespace Logic.Days
         /// </summary>
         private class BigFabricSquare
         {
-            public BigFabricSquare(int stride)
+            public BigFabricSquare(int stride, HashSet<Fabric> fabrics)
             {
                 Stride = stride;
                 SquareValues = new int?[stride * stride];
-            }
-            public int Stride { get; set; }
-            public int?[] SquareValues { get; set; }
-            public HashSet<int> OverlappingIDs { get; set; } = new HashSet<int>();
-
-            private int? GetCurrentSquareValue(int x, int y) {
-                return SquareValues[x + y * Stride];
+                OverlappingIDs = fabrics.Select(c => c.ID).Distinct().ToHashSet();
+                
+                //Stitch fabrics to big Square
+                foreach (var fabric in fabrics) Stitch(fabric);
             }
 
             public int CountOverlappingFabricSquares() {
+
                 return SquareValues.Where(c => c == 0).Count();
             }
 
+            public int NoNOverlappingID()
+            {
+                return OverlappingIDs.First();
+            }
+
+            private HashSet<int> OverlappingIDs { get; set; } = new HashSet<int>();
+            private int? GetCurrentSquareValue(int x, int y) {
+                return SquareValues[x + y * Stride];
+            }
+            private int Stride { get; set; }
+            private int?[] SquareValues { get; set; }
+
             /// <summary>
-            /// Claim will be made on the big square
+            /// Claim will be made onto the big square
             /// </summary>
             /// <param name="fabric"></param>
-            public void Stitch(Fabric fabric) {
+            private void Stitch(Fabric fabric) {
                 for (int x = 0; x < fabric.FabricSideX; x++)
                 {
                     for (int y = 0; y < fabric.FabricSideY; y++)
@@ -73,9 +83,9 @@ namespace Logic.Days
                         var currentSquareValue = GetCurrentSquareValue(fabric.LeftMargin + x, fabric.TopMargin + y);
                         if (currentSquareValue.HasValue)
                         {
-                           if (!OverlappingIDs.Contains(fabric.ID)) OverlappingIDs.Add(fabric.ID);
-                           if (!OverlappingIDs.Contains(currentSquareValue.Value)) OverlappingIDs.Add(currentSquareValue.Value);
-                           currentSquareValue = 0;
+                            OverlappingIDs.Remove(fabric.ID);
+                            OverlappingIDs.Remove(currentSquareValue.Value);
+                            currentSquareValue = 0;
                         }
                         else {
                             currentSquareValue = fabric.ID;
@@ -108,10 +118,7 @@ namespace Logic.Days
         public string Part1()
         {
             var fabrics = new Regex("[@:#]").Replace(PuzzleInput, string.Empty).Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Select(d => d.Split(new[] { "x", "," }, StringSplitOptions.None).Select(f => Convert.ToInt32(f)).ToArray()).ToArray()).Select(g=> new Fabric() { ID = g[0][0], LeftMargin = g[1][0], TopMargin = g[1][1],  FabricSideX = g[2][0], FabricSideY = g[2][1]  }).ToHashSet();
-            var bigFabricSquare = new BigFabricSquare(Test ? 15 : 1000);
-            
-            //Stitch fabric to big Square
-            foreach (var fabric in fabrics) bigFabricSquare.Stitch(fabric);
+            var bigFabricSquare = new BigFabricSquare(Test ? 15 : 1000, fabrics);
 
             //Print big square to debug window during test
             bigFabricSquare.Print();
@@ -121,15 +128,12 @@ namespace Logic.Days
         public string Part2()
         {
             var fabrics = new Regex("[@:#]").Replace(PuzzleInput, string.Empty).Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Select(d => d.Split(new[] { "x", "," }, StringSplitOptions.None).Select(f => Convert.ToInt32(f)).ToArray()).ToArray()).Select(g => new Fabric() { ID = g[0][0], LeftMargin = g[1][0], TopMargin = g[1][1], FabricSideX = g[2][0], FabricSideY = g[2][1] }).ToHashSet();
-            var bigFabricSquare = new BigFabricSquare(Test ? 15 : 1000);
-
-            //Stitch fabric to big Square
-            foreach (var fabric in fabrics) bigFabricSquare.Stitch(fabric);
+            var bigFabricSquare = new BigFabricSquare(Test ? 15 : 1000, fabrics);
 
             //Print big square to debug window during test
             bigFabricSquare.Print();
-
-            return fabrics.Select(c => c.ID).Except(bigFabricSquare.OverlappingIDs).First().ToString();
+            return bigFabricSquare.NoNOverlappingID().ToString();
+            //return fabrics.Select(c => c.ID).Except(bigFabricSquare.OverlappingIDs).First().ToString();
         }
     }
 }

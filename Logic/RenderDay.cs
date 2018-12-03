@@ -24,6 +24,15 @@ namespace Logic
                     return null;
             }
         }
-    }
 
+        public static List<AdventInterface> GetOverview()
+        {
+            var overviewList = new List<AdventInterface>();
+            overviewList.Add(new Day1());
+            overviewList.Add(new Day2());
+            overviewList.Add(new Day3());
+
+            return overviewList;
+        }
+    }
 }
