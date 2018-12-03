@@ -5,5 +5,7 @@
         string[] Solution();
         string Part1();
         string Part2();
+        string GetListName();
+        int GetID();
     }
 }

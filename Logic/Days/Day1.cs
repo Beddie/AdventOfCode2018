@@ -48,6 +48,16 @@ namespace Logic.Days
                 }
             }
         }
+
+        public string GetListName()
+        {
+            return "Day 1: Chronal Calibration";
+        }
+
+        public int GetID()
+        {
+            return 1;
+        }
     }
 }
 

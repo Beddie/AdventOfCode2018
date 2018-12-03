@@ -135,6 +135,15 @@ namespace Logic.Days
             return bigFabricSquare.NoNOverlappingID().ToString();
             //return fabrics.Select(c => c.ID).Except(bigFabricSquare.OverlappingIDs).First().ToString();
         }
+
+        public string GetListName()
+        {
+            return "Day 3: No Matter How You Slice It";
+        }
+        public int GetID()
+        {
+            return 3;
+        }
     }
 }
 

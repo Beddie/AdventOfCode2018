@@ -75,6 +75,15 @@ namespace Logic.Days
                 }));
             return returnstring;
         }
+        public string GetListName()
+        {
+            return "Day 2: Inventory Management System";
+        }
+        public int GetID()
+        {
+            return 2;
+        }
     }
+
 }
 
