@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Logic.Days
 {
-    class Day3 : AdventBase, AdventInterface
+    public class Day3 : AdventBase, AdventInterface
     {
         public Day3()
         {

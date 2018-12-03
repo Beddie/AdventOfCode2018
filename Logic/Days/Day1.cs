@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Logic.Days
 {
-    class Day1 : AdventBase, AdventInterface
+    public class Day1 : AdventBase, AdventInterface
     {
         public Day1()
         {

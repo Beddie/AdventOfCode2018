@@ -1,6 +1,9 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
+    background: #0f0f23;
+    color: #ccc;
+    font-family: 'Courier New';
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -21,4 +24,18 @@ input,
 select,
 textarea {
     max-width: 280px;
+}
+
+.logo {
+    color: #009900;
+}
+
+.advent {
+    color: #00cc00;
+    font-size: 18px;
+    text-shadow: 0 0 2px #00cc00, 0 0 5px #00cc00;
+}
+.advent:hover {
+    color: #99ff99;
+    text-shadow: 0 0 2px #99ff99, 0 0 5px #99ff99;
 }

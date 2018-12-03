@@ -12,8 +12,7 @@ namespace AdventOfCode2018.Controllers
     {
         public ActionResult Index()
         {
-            var day = RenderDay.GetOverview();
-            ViewBag.answer = day;
+            ViewBag.days = RenderDay.GetOverview();
             return View();
         }
 
