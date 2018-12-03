@@ -16,13 +16,13 @@ namespace AdventCode2017
         public struct DeadBridge
         {
             public int HighScore;
-            public List<Component> Components;
+            public int AmountComponents;
         }
-        public List<DeadBridge> DeadBridges = new List<DeadBridge>();
+        public HashSet<DeadBridge> DeadBridges = new HashSet<DeadBridge>();
 
         public Dag24()
         {
-            CalculateAnswerA();
+            CalculateAnswerB();
             WriteDebugAnswers(this);
         }
 
@@ -53,6 +53,11 @@ namespace AdventCode2017
 
         public void CalculateAnswerB()
         {
+            components = puzzleText.Split('\r').Select(c => c.Split('/')).Select(c => new Component(c[0], c[1])).ToList();
+            BuildBridge(components, 0);
+            var maxComponents = DeadBridges.Select(c => c.AmountComponents).Max();
+            var longerstBridges = DeadBridges.Where(f=> f.AmountComponents == maxComponents).ToHashSet(); // Where(d=> d.)Count().Select(c => c.HighScore).Max();
+            Answer2 = longerstBridges.Select(c=> c.HighScore).Max();
         }
 
         private void BuildBridge(List<Component> previousMatchList, int matchValue)
@@ -92,9 +97,9 @@ namespace AdventCode2017
             else
             {
                 //DEAD!
-                var deadList = matchList.Where(c => c.Status == Status.matched).ToList();
+                var deadList = matchList.Where(c => c.Status == Status.matched);
+                DeadBridges.Add(new DeadBridge() { AmountComponents = deadList.Count(), HighScore = deadList.Sum(c => c.GetTotalScore())});
                 // matchList.Dump();
-                DeadBridges.Add(new DeadBridge() { Components = deadList, HighScore = deadList.Sum(c => c.GetTotalScore()) });
             }
         }
 
