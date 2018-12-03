@@ -87,5 +87,11 @@
   <ItemGroup>
     <Content Include="2017\Glider.png" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Logic\Logic.csproj">
+      <Project>{E7EBA673-6EB4-4EFD-B3E2-5C04E7D9FB27}</Project>
+      <Name>Logic</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

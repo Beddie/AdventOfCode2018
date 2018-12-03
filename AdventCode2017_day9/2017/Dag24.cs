@@ -1,19 +1,16 @@
 ﻿using AdventCode;
 using AdventCode.Properties;
+using Logic.ExtensionMethods;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace AdventCode2017
 {
     public class Dag24 : AdventBase, AdventInterface
     {
-        public static bool test = true;
+        public static bool test = false;
         public string puzzleText = test ? Resources.dag24_2017_test : Resources.dag24_2017;
         private List<Component> components;
         public struct DeadBridge
@@ -21,9 +18,7 @@ namespace AdventCode2017
             public int HighScore;
             public List<Component> Components;
         }
-        public static List<DeadBridge> DeadBridges = new List<DeadBridge>();
-
-
+        public List<DeadBridge> DeadBridges = new List<DeadBridge>();
 
         public Dag24()
         {
@@ -31,67 +26,13 @@ namespace AdventCode2017
             WriteDebugAnswers(this);
         }
 
-
-        private void BuildBridge(Component previousMatch, List<Component> previousMatchList, int matchValue)
-        {
-            //Set status matched
-            var matchList = previousMatchList.Select(x => new Component()
-            {
-                Status = x.Status,
-                Values = x.Values
-            }).ToList();
-
-            var matcher = matchList.FirstOrDefault(c => c.Status == Status.unMatched && c.Values.All(x => previousMatch.Values.Contains(x)));
-            if (matcher != null) { matcher.Status = Status.matched; }
-
-            var listMatches = matchList.Where(c => c.Status == Status.unMatched && c.Values.Contains(matchValue)).ToList();
-
-            if (listMatches.Any())
-            {
-                foreach (var match in listMatches)
-                {
-                    var matching = matchList.Where(c => c == match).FirstOrDefault();
-                    //Based on previous value(s) delete this value 
-                    var deleteValuesList = new List<int>();
-                    deleteValuesList.AddRange(matching.Values);
-                    deleteValuesList.Remove(matchValue);
-
-                    //matching.MatchValues.Add(deleteValuesList.First());
-                    BuildBridge(matching, matchList, deleteValuesList.First());
-                }
-            }
-            else
-            {
-                //DEAD!
-                var deadList = matchList.Where(c => c.Status == Status.matched).ToList();
-
-                DeadBridges.Add(new DeadBridge() { Components = deadList, HighScore = deadList.Sum(c => c.GetTotalScore()) });
-
-            }
-
-        }
-
         public void CalculateAnswerA()
         {
-
             //Build list of components
             components = puzzleText.Split('\r').Select(c => c.Split('/')).Select(c => new Component(c[0], c[1])).ToList();
-            BuildBridge(new Component("0", "0"), components, 0);
-            //startComponent.BuildBridge(components, null);
+            BuildBridge(components, 0);
             var highScore = DeadBridges.Select(c => c.HighScore).Max();
-
-
-
-            //Build bridges, Jump into matches loop
-
-            //Scaffolding dead bridges
-            //FInd highscore
-
-
-
-            //put puzzleinput into list of pairs
-            using (StringReader reader = new StringReader(puzzleText)) { }
-
+            Answer1 = highScore;
             //use each compponent only once, which makes the stongest bridge?
             //Must start with 0
             //Ports must match (side does not matter)
@@ -112,14 +53,51 @@ namespace AdventCode2017
 
         public void CalculateAnswerB()
         {
-
         }
 
-        public enum Status
+        private void BuildBridge(List<Component> previousMatchList, int matchValue)
         {
-            unMatched = 0,
-            matched = 1
+            var matchList = previousMatchList.Select(x => new Component()
+            {
+                Status = x.Status,
+                Values = x.Values
+            }).ToList();
+
+            var listMatches = matchList.Where(c => c.Status == Status.unMatched && c.Values.Contains(matchValue)).ToHashSet();
+
+            if (listMatches.Any())
+            {
+                foreach (var match in listMatches)
+                {
+                    //Map previousMatchList to new object
+                    var matchListToPass = previousMatchList.Select(x => new Component()
+                    {
+                        Status = x.Status,
+                        Values = x.Values
+                    }).ToList();
+
+                    //Set status matched to current match
+                    var matching = matchListToPass.Where(c => c.Values == match.Values).FirstOrDefault();
+                    matching.Status = Status.matched;
+
+                    //Based on previous value(s) delete this value and pass value to match
+                    var valuesToMatchNext = new List<int>();
+                    valuesToMatchNext.AddRange(matching.Values);
+                    valuesToMatchNext.Remove(matchValue);
+
+                    //Recursive build bridges
+                    BuildBridge(matchListToPass, valuesToMatchNext.First());
+                }
+            }
+            else
+            {
+                //DEAD!
+                var deadList = matchList.Where(c => c.Status == Status.matched).ToList();
+                // matchList.Dump();
+                DeadBridges.Add(new DeadBridge() { Components = deadList, HighScore = deadList.Sum(c => c.GetTotalScore()) });
+            }
         }
+
         public class Component
         {
             public Component() { }
@@ -131,13 +109,16 @@ namespace AdventCode2017
             
             public List<int> Values = new List<int>();
             public Status Status { get; set; } = Status.unMatched;
-            //public byte portNumberToBeMatched = 0;
-            //public byte? portNumberToMatch = (byte?)null;
             public int GetTotalScore()
             {
                 return Values.Sum();
             }
+        }
 
+        public enum Status
+        {
+            unMatched = 0,
+            matched = 1
         }
     }
 }
