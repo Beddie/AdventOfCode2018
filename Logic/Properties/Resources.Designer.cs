@@ -205,5 +205,49 @@ namespace Logic.Properties {
                 return ResourceManager.GetString("Day2", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #1 @ 35,93: 11x13
+        ///#2 @ 518,811: 15x18
+        ///#3 @ 335,512: 11x10
+        ///#4 @ 635,155: 14x24
+        ///#5 @ 919,43: 10x16
+        ///#6 @ 391,695: 14x16
+        ///#7 @ 635,372: 17x17
+        ///#8 @ 289,489: 19x29
+        ///#9 @ 695,413: 10x25
+        ///#10 @ 730,730: 27x11
+        ///#11 @ 680,761: 29x22
+        ///#12 @ 44,685: 18x23
+        ///#13 @ 71,613: 28x16
+        ///#14 @ 292,456: 22x17
+        ///#15 @ 16,950: 14x10
+        ///#16 @ 778,140: 27x23
+        ///#17 @ 448,425: 22x22
+        ///#18 @ 681,770: 28x21
+        ///#19 @ 19,172: 23x21
+        ///#20 @ 542,333: 17x18
+        ///#21 @ 12,919: 14x20
+        ///#22 @ 466,752: 28x14
+        ///#23 @ 700,661: 18x21
+        ///#24 @ 582,738: 29x24
+        ///# [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Day3 {
+            get {
+                return ResourceManager.GetString("Day3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #1 @ 1,3: 4x4
+        ///#2 @ 3,1: 4x4
+        ///#3 @ 5,5: 2x2.
+        /// </summary>
+        internal static string Day3Example {
+            get {
+                return ResourceManager.GetString("Day3Example", resourceCulture);
+            }
+        }
     }
 }

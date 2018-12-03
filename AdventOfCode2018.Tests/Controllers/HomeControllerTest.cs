@@ -12,6 +12,9 @@ namespace AdventOfCode2018.Tests.Controllers
         [TestMethod]
         public void DayRender()
         {
+            var day3 = RenderDay.GetDay(3);
+            var check3 = day3.Part2();
+
             var averageRunTime = new HashSet<long>();
 
             //Execute puzzle 100 times
