@@ -12,7 +12,7 @@ namespace Logic.Days
     {
         public object Answer1 { get; set; }
         public object Answer2 { get; set; }
-        public bool Test { get; set; }
+        public static bool Test { get; set; }
         public string PuzzleInput {get; set;}
 
         public void WriteDebugAnswers(object className)

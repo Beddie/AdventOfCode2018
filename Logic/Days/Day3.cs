@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,6 +27,9 @@ namespace Logic.Days
             };
         }
 
+        /// <summary>
+        /// Fabric class, will be used by an Elf
+        /// </summary>
         private class Fabric
         {
             public int ID { get; set; }
@@ -33,95 +37,99 @@ namespace Logic.Days
             public int TopMargin { get; set; }
             public int FabricSideX { get; set; }
             public int FabricSideY { get; set; }
-            public bool HasOverlap { get; set; }
         }
 
-        private class FabricSquare
+        /// <summary>
+        /// Square where area claimes will be made by Elves!
+        /// </summary>
+        private class BigFabricSquare
         {
-            public int Stride { get; set; }
-            public int[] GridValues { get; set; }
-            private int GridValue(int x, int y) {
-                return GridValues[x + y * Stride];
+            public BigFabricSquare(int stride)
+            {
+                Stride = stride;
+                SquareValues = new int?[stride * stride];
             }
-            private int SquareGridValue(int x, int y) {
-                return GridValue(x, y);
+            public int Stride { get; set; }
+            public int?[] SquareValues { get; set; }
+            public HashSet<int> OverlappingIDs { get; set; } = new HashSet<int>();
+
+            private int? GetCurrentSquareValue(int x, int y) {
+                return SquareValues[x + y * Stride];
             }
 
             public int CountOverlappingFabricSquares() {
-                return GridValues.Where(c => c == -1).Count();
+                return SquareValues.Where(c => c == 0).Count();
             }
 
-            public List<int> overlappingIDs { get; set; } = new List<int>();
+            /// <summary>
+            /// Claim will be made on the big square
+            /// </summary>
+            /// <param name="fabric"></param>
             public void Stitch(Fabric fabric) {
                 for (int x = 0; x < fabric.FabricSideX; x++)
                 {
                     for (int y = 0; y < fabric.FabricSideY; y++)
                     {
-                        var currentSquareValue = SquareGridValue(fabric.LeftMargin + x, fabric.TopMargin + y);
-                        if (currentSquareValue != 0)
+                        var currentSquareValue = GetCurrentSquareValue(fabric.LeftMargin + x, fabric.TopMargin + y);
+                        if (currentSquareValue.HasValue)
                         {
-                            overlappingIDs.Add(fabric.ID);
-                            overlappingIDs.Add(currentSquareValue);
-                            currentSquareValue = -1;
+                           if (!OverlappingIDs.Contains(fabric.ID)) OverlappingIDs.Add(fabric.ID);
+                           if (!OverlappingIDs.Contains(currentSquareValue.Value)) OverlappingIDs.Add(currentSquareValue.Value);
+                           currentSquareValue = 0;
                         }
                         else {
                             currentSquareValue = fabric.ID;
                         }
-                        GridValues[fabric.LeftMargin + x + ((fabric.TopMargin + y) * Stride)] = currentSquareValue;
+                        SquareValues[fabric.LeftMargin + x + ((fabric.TopMargin + y) * Stride)] = currentSquareValue;
                     }
                 }
             }
 
             public void Print()
             {
-                var printstring = new StringBuilder();
-                for (int y = 0; y < Stride; y++)
+                if (Test)
                 {
-                    for (int x = 0; x < Stride; x++)
+                    var printstring = new StringBuilder();
+                    for (int y = 0; y < Stride; y++)
                     {
-                        var pixel = GridValues[x + y * Stride];
-                        printstring.Append(string.Format("{0}", pixel == 0 ? "  .  " : pixel == -1 ? "  X  " : $"{pixel}".PadRight(5, ' ')));
+                        for (int x = 0; x < Stride; x++)
+                        {
+                            var pixel = SquareValues[x + y * Stride];
+                            printstring.Append(string.Format("{0}", !pixel.HasValue ? "  .  " : pixel.Value == 0 ? "  X  " : $"{pixel}".PadRight(5, ' ')));
+                        }
+                        printstring.AppendLine("");
                     }
-                    printstring.AppendLine("");
+                    printstring.AppendLine();
+                    Debug.Print(printstring.ToString());
                 }
-                printstring.AppendLine();
-                Debug.Print(printstring.ToString());
             }
-
         }
 
         public string Part1()
         {
-            var stride = Test ? 15 : 1000;
-            //var fabricSquare = new int[stride * stride];
-            var fabricSquare = new FabricSquare() { Stride = stride, GridValues = new int[stride * stride] };
+            var fabrics = new Regex("[@:#]").Replace(PuzzleInput, string.Empty).Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Select(d => d.Split(new[] { "x", "," }, StringSplitOptions.None).Select(f => Convert.ToInt32(f)).ToArray()).ToArray()).Select(g=> new Fabric() { ID = g[0][0], LeftMargin = g[1][0], TopMargin = g[1][1],  FabricSideX = g[2][0], FabricSideY = g[2][1]  }).ToHashSet();
+            var bigFabricSquare = new BigFabricSquare(Test ? 15 : 1000);
+            
+            //Stitch fabric to big Square
+            foreach (var fabric in fabrics) bigFabricSquare.Stitch(fabric);
 
-            var fabrics = PuzzleInput.Replace("@", "").Replace(":", "").Replace("#", "").Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.Split(new[] { " " }, StringSplitOptions.None).Where(e => !string.IsNullOrEmpty(e)).ToArray().Select(d => d.Split(new[] { "x", "," }, StringSplitOptions.None).ToArray().Select(f => Convert.ToInt32(f)).ToArray()).ToArray()).Select(g=> new Fabric() { ID = g[0][0], LeftMargin = g[1][0], TopMargin = g[1][1],  FabricSideX = g[2][0], FabricSideY = g[2][1]  }).ToHashSet();
-
-            foreach (var fabric in fabrics)
-            {
-                fabricSquare.Stitch(fabric);
-            }
-            fabricSquare.Print();
-
-            return fabricSquare.CountOverlappingFabricSquares().ToString();
+            //Print big square to debug window during test
+            bigFabricSquare.Print();
+           return bigFabricSquare.CountOverlappingFabricSquares().ToString();
         }
 
         public string Part2()
         {
-            var stride = Test ? 15 : 1000;
-            //var fabricSquare = new int[stride * stride];
-            var fabricSquare = new FabricSquare() { Stride = stride, GridValues = new int[stride * stride] };
+            var fabrics = new Regex("[@:#]").Replace(PuzzleInput, string.Empty).Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Select(d => d.Split(new[] { "x", "," }, StringSplitOptions.None).Select(f => Convert.ToInt32(f)).ToArray()).ToArray()).Select(g => new Fabric() { ID = g[0][0], LeftMargin = g[1][0], TopMargin = g[1][1], FabricSideX = g[2][0], FabricSideY = g[2][1] }).ToHashSet();
+            var bigFabricSquare = new BigFabricSquare(Test ? 15 : 1000);
 
-            var fabrics = PuzzleInput.Replace("@", "").Replace(":", "").Replace("#", "").Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.Split(new[] { " " }, StringSplitOptions.None).Where(e => !string.IsNullOrEmpty(e)).ToArray().Select(d => d.Split(new[] { "x", "," }, StringSplitOptions.None).ToArray().Select(f => Convert.ToInt32(f)).ToArray()).ToArray()).Select(g => new Fabric() { ID = g[0][0], LeftMargin = g[1][0], TopMargin = g[1][1], FabricSideX = g[2][0], FabricSideY = g[2][1] }).ToHashSet();
+            //Stitch fabric to big Square
+            foreach (var fabric in fabrics) bigFabricSquare.Stitch(fabric);
 
-            foreach (var fabric in fabrics)
-            {
-                fabricSquare.Stitch(fabric);
-            }
-            fabricSquare.Print();
+            //Print big square to debug window during test
+            bigFabricSquare.Print();
 
-            return fabrics.Select(c => c.ID).Except(fabricSquare.overlappingIDs).First().ToString();
+            return fabrics.Select(c => c.ID).Except(bigFabricSquare.OverlappingIDs).First().ToString();
         }
     }
 }

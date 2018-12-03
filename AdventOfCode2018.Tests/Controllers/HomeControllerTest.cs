@@ -12,19 +12,22 @@ namespace AdventOfCode2018.Tests.Controllers
         [TestMethod]
         public void DayRender()
         {
-            var day3 = RenderDay.GetDay(3);
-            var check3 = day3.Part2();
+          
 
             var averageRunTime = new HashSet<long>();
 
             //Execute puzzle 100 times
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 100; i++)
             {
                 var sw = new Stopwatch();
                 sw.Start();
-                var day = RenderDay.GetDay(2);
-                var check = day.Part2();
-                Assert.AreEqual(check, day.Solution()[1]);
+                var day = RenderDay.GetDay(3);
+                var check = day.Part1();
+                var check2 = day.Part2();
+                //var day = RenderDay.GetDay(2);
+                //var check = day.Part2();
+                Assert.AreEqual(check, day.Solution()[0]);
+                Assert.AreEqual(check2, day.Solution()[1]);
                 sw.Stop();
                 averageRunTime.Add(sw.ElapsedMilliseconds);
                 //Debug.WriteLine($"Completed in {sw.ElapsedMilliseconds} ms");
