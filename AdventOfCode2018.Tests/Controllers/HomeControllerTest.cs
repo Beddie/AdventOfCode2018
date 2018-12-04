@@ -12,12 +12,10 @@ namespace AdventOfCode2018.Tests.Controllers
         [TestMethod]
         public void DayRender()
         {
-          
-
             var averageRunTime = new HashSet<long>();
 
             //Execute puzzle 100 times
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1; i++)
             {
                 var sw = new Stopwatch();
                 sw.Start();

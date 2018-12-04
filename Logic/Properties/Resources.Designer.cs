@@ -249,5 +249,51 @@ namespace Logic.Properties {
                 return ResourceManager.GetString("Day3Example", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [1518-05-30 00:04] Guard #2417 begins shift
+        ///[1518-10-20 00:48] wakes up
+        ///[1518-08-12 00:14] falls asleep
+        ///[1518-05-09 23:54] Guard #2969 begins shift
+        ///[1518-07-28 00:14] falls asleep
+        ///[1518-09-06 23:57] Guard #797 begins shift
+        ///[1518-05-14 00:54] wakes up
+        ///[1518-08-24 00:45] falls asleep
+        ///[1518-09-26 00:47] falls asleep
+        ///[1518-02-18 23:58] Guard #521 begins shift
+        ///[1518-06-15 00:58] wakes up
+        ///[1518-03-02 00:19] falls asleep
+        ///[1518-03-21 00:00] Guard #521 begins shift
+        ///[1518-02-26 00:40] wakes up
+        ///[1518-04- [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Day4 {
+            get {
+                return ResourceManager.GetString("Day4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [1518-11-01 00:00] Guard #10 begins shift
+        ///[1518-11-01 00:05] falls asleep
+        ///[1518-11-01 00:25] wakes up
+        ///[1518-11-01 00:30] falls asleep
+        ///[1518-11-01 00:55] wakes up
+        ///[1518-11-01 23:58] Guard #99 begins shift
+        ///[1518-11-02 00:40] falls asleep
+        ///[1518-11-02 00:50] wakes up
+        ///[1518-11-03 00:05] Guard #10 begins shift
+        ///[1518-11-03 00:24] falls asleep
+        ///[1518-11-03 00:29] wakes up
+        ///[1518-11-04 00:02] Guard #99 begins shift
+        ///[1518-11-04 00:36] falls asleep
+        ///[1518-11-04 00:46] wakes up
+        ///[1518-11-05 00:03] Guard #99 b [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Day4Example {
+            get {
+                return ResourceManager.GetString("Day4Example", resourceCulture);
+            }
+        }
     }
 }

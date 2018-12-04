@@ -65,9 +65,6 @@ namespace Logic.Days
             }
 
             private HashSet<int> OverlappingIDs { get; set; } = new HashSet<int>();
-            private int? GetCurrentSquareValue(int x, int y) {
-                return SquareValues[x + y * Stride];
-            }
             private int Stride { get; set; }
             private int?[] SquareValues { get; set; }
 
@@ -80,17 +77,18 @@ namespace Logic.Days
                 {
                     for (int y = 0; y < fabric.FabricSideY; y++)
                     {
-                        var currentSquareValue = GetCurrentSquareValue(fabric.LeftMargin + x, fabric.TopMargin + y);
+                        var index = fabric.LeftMargin + x + ((fabric.TopMargin + y) * Stride);
+                        var currentSquareValue = SquareValues[index];
                         if (currentSquareValue.HasValue)
                         {
-                            OverlappingIDs.Remove(fabric.ID);
-                            OverlappingIDs.Remove(currentSquareValue.Value);
+                            if (OverlappingIDs.Contains(fabric.ID)) OverlappingIDs.Remove(fabric.ID);
+                            if (OverlappingIDs.Contains(currentSquareValue.Value)) OverlappingIDs.Remove(currentSquareValue.Value);
                             currentSquareValue = 0;
                         }
                         else {
                             currentSquareValue = fabric.ID;
                         }
-                        SquareValues[fabric.LeftMargin + x + ((fabric.TopMargin + y) * Stride)] = currentSquareValue;
+                        SquareValues[index] = currentSquareValue;
                     }
                 }
             }

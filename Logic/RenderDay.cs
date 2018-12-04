@@ -20,6 +20,8 @@ namespace Logic
                     return new Day2();
                 case 3:
                     return new Day3();
+                case 4:
+                    return new Day4();
                 default:
                     return null;
             }
@@ -31,6 +33,7 @@ namespace Logic
             overviewList.Add(new Day1());
             overviewList.Add(new Day2());
             overviewList.Add(new Day3());
+            overviewList.Add(new Day4());
 
             return overviewList;
         }
