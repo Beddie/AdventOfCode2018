@@ -295,5 +295,23 @@ namespace Logic.Properties {
                 return ResourceManager.GetString("Day4Example", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to OoibdgGDEesYySsSMmlLIKkkVvKvViERxXVvrfmMsSFeaAvnNVdMmJjDBmMXbBJjWwPZzpHhLlCsSfFpPcKVvxlLXbBkxUIJjfFoOigEeGHhdDJjdDAazTtrRCotTFfOoOcZPDejJEdpTzsSYzZMmyMmZtshHJzZkKYyJjnAaNjpflLFPUuNndnPpNxAiIMbBCcgLlGPrRpmaHnNhXDoOzZxXUdjJWwilLIDutWwTjwMmWcCJvVxXthHfFkKdDWwmMHjbBKkRrXxlLJhOoTYytKZzrGvVgabbBBjJpPAKMmsSktwWfFTWoOwdDWpPRrPoOpBFfbOonZzNZzrRiWwIhHwrlLRZAKkNntAazzZZYykPfFppjWwJPKWwTWVvwwWCckKuUPpcVBbbBvVmMvxXwWKkMmaAKkZzQqOoJjTttTzZNnlrPkKpRrRRrLCxXeOoXYeeEELliIyxEajJwKkIiFmMfvisSIEeZzPpAaSsVGNkKqOoQiInAaHhAEeIaiI [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Day5 {
+            get {
+                return ResourceManager.GetString("Day5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to dabAcCaCBAcCcaDA.
+        /// </summary>
+        internal static string Day5Example {
+            get {
+                return ResourceManager.GetString("Day5Example", resourceCulture);
+            }
+        }
     }
 }

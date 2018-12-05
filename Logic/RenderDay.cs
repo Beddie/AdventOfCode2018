@@ -22,6 +22,8 @@ namespace Logic
                     return new Day3();
                 case 4:
                     return new Day4();
+                case 5:
+                    return new Day5();
                 default:
                     return null;
             }
@@ -30,10 +32,15 @@ namespace Logic
         public static List<AdventInterface> GetOverview()
         {
             var overviewList = new List<AdventInterface>();
-            overviewList.Add(new Day1());
-            overviewList.Add(new Day2());
-            overviewList.Add(new Day3());
-            overviewList.Add(new Day4());
+            for (int i = 0; i < 26; i++)
+            {
+                var day = GetDay(i);
+                if (day != null) overviewList.Add(day);
+            }
+            //overviewList.Add(new Day1());
+            //overviewList.Add(new Day2());
+            //overviewList.Add(new Day3());
+            //overviewList.Add(new Day4());
 
             return overviewList;
         }
