@@ -1,0 +1,69 @@
+﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification\ 
+for details on configuring this project to bundle and minify static web assets. */
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+    background: #0f0f23;
+    color: #ccc;
+    font-family: 'Courier New';
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+
+/* Carousel */
+.carousel-caption p {
+    font-size: 20px;
+    line-height: 1.4;
+}
+
+/* Make .svg files in the carousel display properly in older browsers */
+.carousel-inner .item img[src$=".svg"] {
+    width: 100%;
+}
+
+/* QR code generator */
+#qrCode {
+    margin: 15px;
+}
+
+/* Hide/rearrange for smaller screens */
+@media screen and (max-width: 767px) {
+    /* Hide captions */
+    .carousel-caption {
+        display: none;
+    }
+}
+
+.logo {
+    color: #009900;
+}
+
+.advent {
+    color: #00cc00;
+    font-size: 18px;
+    text-shadow: 0 0 2px #00cc00, 0 0 5px #00cc00;
+}
+
+    .advent:hover {
+        color: #99ff99;
+        text-shadow: 0 0 2px #99ff99, 0 0 5px #99ff99;
+    }
