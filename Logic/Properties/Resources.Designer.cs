@@ -313,5 +313,25 @@ namespace Logic.Properties {
                 return ResourceManager.GetString("Day5Example", resourceCulture);
             }
         }
+
+
+        internal static string Day6
+        {
+            get
+            {
+                return ResourceManager.GetString("Day6", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to dabAcCaCBAcCcaDA.
+        /// </summary>
+        internal static string Day6Example
+        {
+            get
+            {
+                return ResourceManager.GetString("Day6Example", resourceCulture);
+            }
+        }
     }
 }

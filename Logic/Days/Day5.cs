@@ -54,6 +54,7 @@ namespace Logic.Days
             var testChars = PuzzleInput.ToUpper().Distinct().ToHashSet();
 
             var polymerLength = PuzzleInput.Count();
+
             Parallel.ForEach(testChars, (testChar) =>
             {
                 var shifts = PuzzleInput.ToList();
