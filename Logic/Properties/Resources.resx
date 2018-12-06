@@ -1105,6 +1105,30 @@
 +3
 -76719</value>
   </data>
+  <data name="Day10" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Day10Example" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Day11" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Day11Example" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Day12" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Day12Example" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Day13" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Day13Example" xml:space="preserve">
+    <value />
+  </data>
   <data name="Day2" xml:space="preserve">
     <value>uosnxmfkezbojfdgwvrtaqhluy
 iosnxmfkazbcopdgnvrtaqhluy
@@ -3877,5 +3901,23 @@ iosnxmfyvzbcjpdgwyrtaqhluy</value>
 3, 4
 5, 5
 8, 9</value>
+  </data>
+  <data name="Day7" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Day7Example" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Day8" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Day8Example" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Day9" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Day9Example" xml:space="preserve">
+    <value />
   </data>
 </root>

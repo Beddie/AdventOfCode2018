@@ -333,5 +333,138 @@ namespace Logic.Properties {
                 return ResourceManager.GetString("Day6Example", resourceCulture);
             }
         }
+
+
+        internal static string Day7
+        {
+            get
+            {
+                return ResourceManager.GetString("Day7", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to dabAcCaCBAcCcaDA.
+        /// </summary>
+        internal static string Day7Example
+        {
+            get
+            {
+                return ResourceManager.GetString("Day7Example", resourceCulture);
+            }
+        }
+
+        internal static string Day8
+        {
+            get
+            {
+                return ResourceManager.GetString("Day8", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to dabAcCaCBAcCcaDA.
+        /// </summary>
+        internal static string Day8Example
+        {
+            get
+            {
+                return ResourceManager.GetString("Day8Example", resourceCulture);
+            }
+        }
+
+        internal static string Day9
+        {
+            get
+            {
+                return ResourceManager.GetString("Day9", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to dabAcCaCBAcCcaDA.
+        /// </summary>
+        internal static string Day9Example
+        {
+            get
+            {
+                return ResourceManager.GetString("Day9Example", resourceCulture);
+            }
+        }
+
+        internal static string Day10
+        {
+            get
+            {
+                return ResourceManager.GetString("Day10", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to dabAcCaCBAcCcaDA.
+        /// </summary>
+        internal static string Day10Example
+        {
+            get
+            {
+                return ResourceManager.GetString("Day10Example", resourceCulture);
+            }
+        }
+
+        internal static string Day11
+        {
+            get
+            {
+                return ResourceManager.GetString("Day11", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to dabAcCaCBAcCcaDA.
+        /// </summary>
+        internal static string Day11Example
+        {
+            get
+            {
+                return ResourceManager.GetString("Day11Example", resourceCulture);
+            }
+        }
+
+        internal static string Day12
+        {
+            get
+            {
+                return ResourceManager.GetString("Day12", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to dabAcCaCBAcCcaDA.
+        /// </summary>
+        internal static string Day12Example
+        {
+            get
+            {
+                return ResourceManager.GetString("Day12Example", resourceCulture);
+            }
+        }
+        internal static string Day13
+        {
+            get
+            {
+                return ResourceManager.GetString("Day13", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to dabAcCaCBAcCcaDA.
+        /// </summary>
+        internal static string Day13Example
+        {
+            get
+            {
+                return ResourceManager.GetString("Day13Example", resourceCulture);
+            }
+        }
     }
 }
