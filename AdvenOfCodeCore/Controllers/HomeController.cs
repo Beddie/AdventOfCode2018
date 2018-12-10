@@ -83,15 +83,16 @@ namespace AdvenOfCodeCore.Controllers
         }
 
         //TODO make private leaderboard JSON with cookie WORK :)
-        public async Task<ActionResult> GetLeaderBoard() {
+        public async Task<ActionResult> GetLeaderBoard()
+        {
             var overviewmodel = RenderDay.GetOverview();
             var leaderboard = await GetJSON();
             ViewBag.leaderboard = leaderboard;
             return View("Index", overviewmodel);
         }
 
-       
-        private async Task<string> GetJSON() {
+        private async Task<string> GetJSON()
+        {
             using (var httpClient = new HttpClient())
             {
                 var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://adventofcode.com/2018/leaderboard/private/view/205926.json");
@@ -99,7 +100,8 @@ namespace AdvenOfCodeCore.Controllers
                 var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
                 var httpContent = httpResponseMessage.EnsureSuccessStatusCode();
                 string result = await httpContent.Content.ReadAsStringAsync();
-                return result;             }
+                return result;
+            }
         }
     }
 }
