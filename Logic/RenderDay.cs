@@ -32,6 +32,10 @@ namespace Logic
                     return new Day8();
                 case 9:
                     return new Day9();
+                case 10:
+                    return new Day10();
+                case 11:
+                    return new Day11();
 
                 default:
                     return null;
