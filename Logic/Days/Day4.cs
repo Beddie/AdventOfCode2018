@@ -12,15 +12,17 @@ using System.Threading.Tasks;
 
 namespace Logic.Days
 {
-    public class Day4 : AdventBase, AdventInterface
+    public class Day4 : AdventBase
     {
         public Day4()
         {
             // Test = true;
             PuzzleInput = Test ? Resources.Day4Example : Resources.Day4;
+            ID = 4;
+            Name = "Day 4: Repose Record";
         }
 
-        public string[] Solution()
+        public override string[] Solution()
         {
             return new string[] {
                 "12504",
@@ -53,7 +55,7 @@ namespace Logic.Days
             public ShiftEvent ShiftEvent { get; set; }
         }
 
-        public string Part1()
+        public override string Part1()
         {
             var shifts = PuzzleInput.Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.ToCharArray()).Select(c =>
                 new Shift()
@@ -89,7 +91,7 @@ namespace Logic.Days
                 }
             }
 
-            var groupedGuards = allGuardsShifts.GroupBy(c => c.ID).Select(c => new Guard() { ID = c.Key,  SleepPeriods = c.SelectMany(d => d.SleepPeriods).ToHashSet() }).ToHashSet();
+            var groupedGuards = allGuardsShifts.GroupBy(c => c.ID).Select(c => new Guard() { ID = c.Key, SleepPeriods = c.SelectMany(d => d.SleepPeriods).ToHashSet() }).ToHashSet();
             var aslaap = groupedGuards.Select(c => new { guardID = c.ID, minutesAsleep = AmountMinutes(c.SleepPeriods) });
             var guardMostAsleep = aslaap.Where(c => c.minutesAsleep == aslaap.Max(d => d.minutesAsleep)).First();
 
@@ -134,7 +136,7 @@ namespace Logic.Days
             }
         }
 
-        public string Part2()
+        public override string Part2()
         {
             //Strategy 2: Of all guards, which guard is most frequently asleep on the same minute?
             //In the example above, Guard #99 spent minute 45 asleep more than any other guard or minute - three times in total. 
@@ -205,15 +207,6 @@ namespace Logic.Days
             {
                 return (0, 0);
             }
-        }
-
-        public string GetListName()
-        {
-            return "Day 4: Repose Record";
-        }
-        public int GetID()
-        {
-            return 4;
         }
     }
 }

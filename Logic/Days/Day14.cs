@@ -12,14 +12,14 @@ using System.Threading.Tasks;
 
 namespace Logic.Days
 {
-    public class Day12: AdventBase
+    public class Day14 : AdventBase
     {
-        public Day12()
+        public Day14()
         {
             // Test = true;
-            PuzzleInput = Test ? Resources.Day12Example : Resources.Day12;
-            ID = 12;
-            Name = "Day 12: ";
+            PuzzleInput = Test ? Resources.Day14Example : Resources.Day14;
+            ID = 14;
+            Name = "Day 14:";
         }
 
         public override string[] Solution()

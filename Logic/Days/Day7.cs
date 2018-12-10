@@ -12,15 +12,17 @@ using System.Threading.Tasks;
 
 namespace Logic.Days
 {
-    public class Day7 : AdventBase, AdventInterface
+    public class Day7 : AdventBase
     {
         public Day7()
         {
             //Test = true;
             PuzzleInput = Test ? Resources.Day7Example : Resources.Day7;
+            ID = 7;
+            Name = "Day 7: The Sum of Its Parts";
         }
 
-        public string[] Solution()
+        public override string[] Solution()
         {
             return new string[] {
                 "CFMNLOAHRKPTWBJSYZVGUQXIDE",
@@ -31,7 +33,7 @@ namespace Logic.Days
         private List<char> orderedInstructions = new List<char>();
         private List<char[]> instructions = new List<char[]>();
 
-        public string Part1()
+        public override string Part1()
         {
             instructions = PuzzleInput.Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => new char[2] { c.Skip(5).Take(1).First(), c.Skip(36).Take(1).First() }).ToList();
             var allChars = instructions.Select(c => c[0]).Union(instructions.Select(c => c[1])).Distinct().OrderBy(c => c).ToList();
@@ -101,7 +103,7 @@ namespace Logic.Days
         private List<InstuctionLetter> allChars = new List<InstuctionLetter>();
         private List<Worker> workers { get; set; } = Test ? new List<Worker>() { new Worker(), new Worker() } : new List<Worker>() { new Worker(), new Worker(), new Worker(), new Worker(), new Worker() };
 
-        public string Part2()
+        public override string Part2()
         {
             instructions = PuzzleInput.Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => new char[2] { c.Skip(5).Take(1).First(), c.Skip(36).Take(1).First() }).ToList();
             allChars = instructions.Select(c => c[0]).Union(instructions.Select(c => c[1])).Distinct().OrderBy(c => c).Select((d) => new InstuctionLetter { Letter = d, Seconds = d - (Test ? 64 : 4) }).ToList();
@@ -142,15 +144,5 @@ namespace Logic.Days
 
 
         #endregion
-
-        public string GetListName()
-        {
-            return "Day 7: The Sum of Its Parts";
-        }
-
-        public int GetID()
-        {
-            return 7;
-        }
     }
 }

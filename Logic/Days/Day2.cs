@@ -11,14 +11,16 @@ using System.Threading.Tasks;
 
 namespace Logic.Days
 {
-    public class Day2 : AdventBase, AdventInterface
+    public class Day2 : AdventBase
     {
         public Day2()
         {
             PuzzleInput = Resources.Day2;
+            ID = 2;
+            Name = "Day 2: Inventory Management System";
         }
 
-        public string[] Solution()
+        public override string[] Solution()
         {
             return new string[] {
                 "8610",
@@ -26,7 +28,7 @@ namespace Logic.Days
             };
         }
 
-        public string Part1()
+        public override string Part1()
         {
             var boxIDs = PuzzleInput.Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.ToCharArray()).ToHashSet();
             var countMultiples = new int[2];
@@ -49,7 +51,7 @@ namespace Logic.Days
 
         private object lockLoop = new object();
 
-        public string Part2()
+        public override string Part2()
         {
             var boxIDs = PuzzleInput.Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.ToCharArray()).ToHashSet();
             var numberOfMatchingChars = boxIDs.First().Count() - 1;
@@ -74,14 +76,6 @@ namespace Logic.Days
                     boxIDBuilder.Clear();
                 }));
             return returnstring;
-        }
-        public string GetListName()
-        {
-            return "Day 2: Inventory Management System";
-        }
-        public int GetID()
-        {
-            return 2;
         }
     }
 

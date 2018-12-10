@@ -6,14 +6,16 @@ using System.Linq;
 
 namespace Logic.Days
 {
-    public class Day1 : AdventBase, AdventInterface
+    public class Day1 : AdventBase
     {
         public Day1()
         {
             PuzzleInput = Resources.Day1;
+            ID = 1;
+            Name = "Day 1: Chronal Calibration";
         }
 
-        public string[] Solution()
+        public override string[] Solution()
         {
             return new string[] {
                 "576",
@@ -21,12 +23,12 @@ namespace Logic.Days
             };
         }
 
-        public string Part1()
+        public override string Part1()
         {
             return PuzzleInput.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None).Select(c => Convert.ToInt64(c)).Sum(c => c).ToString();
         }
 
-        public string Part2()
+        public override string Part2()
         {
             var FoundFrequencies = new HashSet<int>();
             var frequencies = PuzzleInput.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None).Select(c => Convert.ToInt32(c));
@@ -49,15 +51,8 @@ namespace Logic.Days
             }
         }
 
-        public string GetListName()
-        {
-            return "Day 1: Chronal Calibration";
-        }
 
-        public int GetID()
-        {
-            return 1;
-        }
+
     }
 }
 

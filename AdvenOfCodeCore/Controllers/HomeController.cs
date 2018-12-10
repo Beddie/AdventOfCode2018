@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using AdvenOfCodeCore.Models;
 using Logic;
 using System.Text;
+using System.Net;
+using System.IO;
+using System.Net.Http;
 
 namespace AdvenOfCodeCore.Controllers
 {
@@ -29,7 +32,7 @@ namespace AdvenOfCodeCore.Controllers
         {
             var overviewmodel = RenderDay.GetOverview();
 
-            var AoCDay = overviewmodel.Where(c => c.GetID() == id).FirstOrDefault();
+            var AoCDay = overviewmodel.Where(c => c.ID == id).FirstOrDefault();
             if (AoCDay != null)
             {
                 var puzzleString = string.Empty;
@@ -69,7 +72,7 @@ namespace AdvenOfCodeCore.Controllers
                 var day1Time = sw.ElapsedMilliseconds - startTime;
                 var day2 = day.Part2();
                 var day2Time = sw.ElapsedMilliseconds - startTime - day1Time;
-                sb.AppendLine($"{day.GetListName()} part1 answer: {day1} ({day1Time} ms), part2 answer: {day2} ({day2Time} ms))");
+                sb.AppendLine($"{day.Name} part1 answer: {day1} ({day1Time} ms), part2 answer: {day2} ({day2Time} ms))");
                 startTime = sw.ElapsedMilliseconds;
             }
             sw.Stop();
@@ -77,6 +80,26 @@ namespace AdvenOfCodeCore.Controllers
             ViewBag.puzzleString = sb.ToString();
 
             return View("Index", overviewmodel);
+        }
+
+        //TODO make private leaderboard JSON with cookie WORK :)
+        public async Task<ActionResult> GetLeaderBoard() {
+            var overviewmodel = RenderDay.GetOverview();
+            var leaderboard = await GetJSON();
+            ViewBag.leaderboard = leaderboard;
+            return View("Index", overviewmodel);
+        }
+
+       
+        private async Task<string> GetJSON() {
+            using (var httpClient = new HttpClient())
+            {
+                var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://adventofcode.com/2018/leaderboard/private/view/205926.json");
+                httpRequestMessage.Headers.Add("Cookie", "{\"key\":\"2018 - 11 - 30499\",\"target\":1544504398}");
+                var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+                var httpContent = httpResponseMessage.EnsureSuccessStatusCode();
+                string result = await httpContent.Content.ReadAsStringAsync();
+                return result;             }
         }
     }
 }

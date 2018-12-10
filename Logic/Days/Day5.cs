@@ -12,21 +12,23 @@ using System.Threading.Tasks;
 
 namespace Logic.Days
 {
-    public class Day5 : AdventBase, AdventInterface
+    public class Day5 : AdventBase
     {
         public Day5()
         {
             PuzzleInput = Test ? Resources.Day5Example : Resources.Day5;
+            ID = 5;
+            Name = "Day 5: Alchemical Reduction";
         }
 
-        public string[] Solution()
+        public override string[] Solution()
         {
             return new string[] {
                 "11152",
                 "6136"
             };
         }
-        public string Part1()
+        public override string Part1()
         {
             var shifts = PuzzleInput.ToList();
             bool changed;
@@ -49,7 +51,7 @@ namespace Logic.Days
 
         private object varSafe = new object();
 
-        public string Part2()
+        public override string Part2()
         {
             var testChars = PuzzleInput.ToUpper().Distinct().ToHashSet();
 
@@ -81,16 +83,6 @@ namespace Logic.Days
                 }
             });
             return polymerLength.ToString();
-        }
-
-        public string GetListName()
-        {
-            return "Day 5: Alchemical Reduction";
-        }
-
-        public int GetID()
-        {
-            return 5;
         }
     }
 }

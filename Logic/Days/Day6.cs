@@ -12,15 +12,17 @@ using System.Threading.Tasks;
 
 namespace Logic.Days
 {
-    public class Day6 : AdventBase, AdventInterface
+    public class Day6 : AdventBase
     {
         public Day6()
         {
             // Test = true;
             PuzzleInput = Test ? Resources.Day6Example : Resources.Day6;
+            ID = 6;
+            Name = "Day 6: Chronal Coordinates";
         }
 
-        public string[] Solution()
+        public override string[] Solution()
         {
             return new string[] {
                 "3969",
@@ -78,7 +80,7 @@ namespace Logic.Days
 
         private int GetManhattenDistance(Coordinate from, Coordinate to) => Math.Abs(from.xVal - to.xVal) + Math.Abs((from.yVal - to.yVal));
 
-        public string Part1()
+        public override string Part1()
         {
             var coordinates = PuzzleInput.Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.Split(new[] { "," }, StringSplitOptions.None)).Select((d, e) => new GridCoordinate() { xVal = Convert.ToInt32(d[0].Trim()), yVal = Convert.ToInt32(d[1].Trim()), Value = (char)(e + 65) }).ToHashSet();
             //Create Grid
@@ -118,7 +120,7 @@ namespace Logic.Days
 
         private object varSafe = new object();
 
-        public string Part2()
+        public override string Part2()
         {
             var coordinates = PuzzleInput.Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.Split(new[] { "," }, StringSplitOptions.None)).Select((d, e) => new GridCoordinate() { xVal = Convert.ToInt32(d[0].Trim()), yVal = Convert.ToInt32(d[1].Trim()), Value = (char)(e + 65) }).ToHashSet();
             //Create Grid
@@ -145,16 +147,6 @@ namespace Logic.Days
             foreach (var coordinate in coordinates) totalDistanceToAllCoordinates += GetManhattenDistance(pixel, coordinate);
             pixel.Value = totalDistanceToAllCoordinates < (Test ? 32 : 10000) ? '#' : '.';
             return pixel;
-        }
-
-        public string GetListName()
-        {
-            return "Day 6: Chronal Coordinates";
-        }
-
-        public int GetID()
-        {
-            return 6;
         }
     }
 }

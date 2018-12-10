@@ -12,14 +12,16 @@ using System.Threading.Tasks;
 
 namespace Logic.Days
 {
-    public class Day3 : AdventBase, AdventInterface
+    public class Day3 : AdventBase
     {
         public Day3()
         {
-            PuzzleInput = Test? Resources.Day3Example : Resources.Day3;
+            PuzzleInput = Test ? Resources.Day3Example : Resources.Day3;
+            ID = 3;
+            Name = "Day 3: No Matter How You Slice It";
         }
 
-        public string[] Solution()
+        public override string[] Solution()
         {
             return new string[] {
                 "110827",
@@ -49,12 +51,13 @@ namespace Logic.Days
                 Stride = stride;
                 SquareValues = new int?[stride * stride];
                 OverlappingIDs = fabrics.Select(c => c.ID).Distinct().ToHashSet();
-                
+
                 //Stitch fabrics to big Square
                 foreach (var fabric in fabrics) Stitch(fabric);
             }
 
-            public int CountOverlappingFabricSquares() {
+            public int CountOverlappingFabricSquares()
+            {
 
                 return SquareValues.Where(c => c == 0).Count();
             }
@@ -72,7 +75,8 @@ namespace Logic.Days
             /// Claim will be made onto the big square
             /// </summary>
             /// <param name="fabric"></param>
-            private void Stitch(Fabric fabric) {
+            private void Stitch(Fabric fabric)
+            {
                 for (int x = 0; x < fabric.FabricSideX; x++)
                 {
                     for (int y = 0; y < fabric.FabricSideY; y++)
@@ -85,7 +89,8 @@ namespace Logic.Days
                             if (OverlappingIDs.Contains(currentSquareValue.Value)) OverlappingIDs.Remove(currentSquareValue.Value);
                             currentSquareValue = 0;
                         }
-                        else {
+                        else
+                        {
                             currentSquareValue = fabric.ID;
                         }
                         SquareValues[index] = currentSquareValue;
@@ -113,17 +118,17 @@ namespace Logic.Days
             }
         }
 
-        public string Part1()
+        public override string Part1()
         {
-            var fabrics = new Regex("[@:#]").Replace(PuzzleInput, string.Empty).Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Select(d => d.Split(new[] { "x", "," }, StringSplitOptions.None).Select(f => Convert.ToInt32(f)).ToArray()).ToArray()).Select(g=> new Fabric() { ID = g[0][0], LeftMargin = g[1][0], TopMargin = g[1][1],  FabricSideX = g[2][0], FabricSideY = g[2][1]  }).ToHashSet();
+            var fabrics = new Regex("[@:#]").Replace(PuzzleInput, string.Empty).Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Select(d => d.Split(new[] { "x", "," }, StringSplitOptions.None).Select(f => Convert.ToInt32(f)).ToArray()).ToArray()).Select(g => new Fabric() { ID = g[0][0], LeftMargin = g[1][0], TopMargin = g[1][1], FabricSideX = g[2][0], FabricSideY = g[2][1] }).ToHashSet();
             var bigFabricSquare = new BigFabricSquare(Test ? 15 : 1000, fabrics);
 
             //Print big square to debug window during test
             bigFabricSquare.Print();
-           return bigFabricSquare.CountOverlappingFabricSquares().ToString();
+            return bigFabricSquare.CountOverlappingFabricSquares().ToString();
         }
 
-        public string Part2()
+        public override string Part2()
         {
             var fabrics = new Regex("[@:#]").Replace(PuzzleInput, string.Empty).Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Select(d => d.Split(new[] { "x", "," }, StringSplitOptions.None).Select(f => Convert.ToInt32(f)).ToArray()).ToArray()).Select(g => new Fabric() { ID = g[0][0], LeftMargin = g[1][0], TopMargin = g[1][1], FabricSideX = g[2][0], FabricSideY = g[2][1] }).ToHashSet();
             var bigFabricSquare = new BigFabricSquare(Test ? 15 : 1000, fabrics);
@@ -132,15 +137,6 @@ namespace Logic.Days
             bigFabricSquare.Print();
             return bigFabricSquare.NoNOverlappingID().ToString();
             //return fabrics.Select(c => c.ID).Except(bigFabricSquare.OverlappingIDs).First().ToString();
-        }
-
-        public string GetListName()
-        {
-            return "Day 3: No Matter How You Slice It";
-        }
-        public int GetID()
-        {
-            return 3;
         }
     }
 }

@@ -12,10 +12,12 @@ using System.Threading.Tasks;
 
 namespace Logic.Days
 {
-    public class Day9 :  AdventBase, AdventInterface
+    public class Day9 : AdventBase
     {
         public Day9()
         {
+            ID = 9;
+            Name = "Day 9: Marble Mania";
             //Test = true;
         }
 
@@ -58,7 +60,7 @@ namespace Logic.Days
             public long Score { get; set; }
         }
 
-        public string[] Solution()
+        public override string[] Solution()
         {
             return new string[] {
                 "404611",
@@ -66,7 +68,7 @@ namespace Logic.Days
             };
         }
 
-        public string Part1()
+        public override string Part1()
         {
             var game = new Game();
 
@@ -82,7 +84,7 @@ namespace Logic.Days
             return highScore.ToString();
         }
 
-        public string Part2()
+        public override string Part2()
         {
             var game = new Game();
 
@@ -99,16 +101,6 @@ namespace Logic.Days
             }
             var highScore = game.Players.Select(c => c.Score).Max();
             return highScore.ToString();
-        }
-
-        public string GetListName()
-        {
-            return "Day 9: Marble Mania";
-        }
-
-        public int GetID()
-        {
-            return 9;
         }
     }
 }

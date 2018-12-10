@@ -17,7 +17,9 @@
     </environment>
 </head>
 <body>
+
     <nav class="navbar navbar-inverse navbar-fixed-top">
+
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -41,10 +43,18 @@
     <partial name="_CookieConsentPartial" />
 
     <div class="container body-content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="logo">
+                    <span class="advent">Advent of Code</span><br />
+                    &lt;y&gt;<span class="advent">2018</span>&lt;y&gt;
+                </div>
+            </div>
+        </div>
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; 2018 - AdvenOfCodeCore</p>
+            <p>&copy; 2018 - Bessel</p>
         </footer>
     </div>
 

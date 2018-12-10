@@ -13,15 +13,17 @@ using System.Threading.Tasks;
 
 namespace Logic.Days
 {
-    public class Day10 : AdventBase, AdventInterface
+    public class Day10 : AdventBase
     {
         public Day10()
         {
             // Test = true;
             PuzzleInput = Test ? Resources.Day10Example : Resources.Day10;
+            ID = 10;
+            Name = "Day 10: The Stars Align";
         }
 
-        public string[] Solution()
+        public override string[] Solution()
         {
             return new string[] {
                 @"
@@ -40,7 +42,7 @@ namespace Logic.Days
             };
         }
 
-        public string Part1()
+        public override string Part1()
         {
             var regex = new Regex(@"\<(.*?)\>");
             var points = PuzzleInput.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).AsParallel()
@@ -97,7 +99,7 @@ namespace Logic.Days
             return null;
         }
 
-        public string Part2()
+        public override string Part2()
         {
             var regex = new Regex(@"\<(.*?)\>");
             var points = PuzzleInput.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).AsParallel()
@@ -134,16 +136,6 @@ namespace Logic.Days
                 PositionY += VelocityY;
             }
         }
-
-        public string GetListName()
-        {
-            return "Day 10: The Stars Align";
-        }
-
-        public int GetID()
-        {
-            return 10;
-        }
-    }
+         }
 }
 

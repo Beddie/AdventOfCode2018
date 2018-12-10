@@ -13,15 +13,17 @@ using System.Threading.Tasks;
 
 namespace Logic.Days
 {
-    public class Day8 : AdventBase, AdventInterface
+    public class Day8 : AdventBase
     {
         public Day8()
         {
             //Test = true;
             PuzzleInput = Test ? Resources.Day8Example : Resources.Day8;
+            ID = 8;
+            Name = "Day 8: Memory Maneuver";
         }
 
-        public string[] Solution()
+        public override string[] Solution()
         {
             return new string[] {
                 "48443",
@@ -46,7 +48,7 @@ namespace Logic.Days
 
         private static List<int> NodeData = new List<int>();
 
-        public string Part1()
+        public override string Part1()
         {
             NodeData = PuzzleInput.Split(" ", StringSplitOptions.RemoveEmptyEntries).Select(c => Convert.ToInt32(c)).ToList();
             var rootNode = new Node() { };
@@ -88,7 +90,7 @@ namespace Logic.Days
             Debug.WriteLine(sb.ToString());
         }
 
-        public string Part2()
+        public override string Part2()
         {
             NodeData = PuzzleInput.Split(" ", StringSplitOptions.RemoveEmptyEntries).Select(c => Convert.ToInt32(c)).ToList();
             var rootNode = new Node();
@@ -101,7 +103,7 @@ namespace Logic.Days
 
         private int GetNodeValueByMetaData(Node node)
         {
-            if (Test && node.Value > 0)  Debug.WriteLine(JsonConvert.SerializeObject(node));
+            if (Test && node.Value > 0) Debug.WriteLine(JsonConvert.SerializeObject(node));
 
             if (!node.HasChildren()) node.Value = node.MetaDataSum;
             else
@@ -115,16 +117,6 @@ namespace Logic.Days
                 node.Value = count;
             }
             return node.Value;
-        }
-
-        public string GetListName()
-        {
-            return "Day 8: Memory Maneuver";
-        }
-
-        public int GetID()
-        {
-            return 8;
         }
     }
 }

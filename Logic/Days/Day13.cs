@@ -12,41 +12,30 @@ using System.Threading.Tasks;
 
 namespace Logic.Days
 {
-    public class Day13: AdventBase, AdventInterface
+    public class Day13: AdventBase
     {
         public Day13()
         {
             // Test = true;
             PuzzleInput = Test ? Resources.Day13Example : Resources.Day13;
+            ID = 13;
+            Name = "Day 13:";
         }
 
-        public string[] Solution()
+        public override string[] Solution()
         {
             return new string[] {
-                "",
-                ""
             };
         }
 
-        public string Part1()
+        public override string Part1()
         {
             return "";
         }
 
-        public string Part2()
+        public override string Part2()
         {
             return "";
-        }
-
-
-        public string GetListName()
-        {
-            return "Day 13";
-        }
-
-        public int GetID()
-        {
-            return 13;
         }
     }
 }
