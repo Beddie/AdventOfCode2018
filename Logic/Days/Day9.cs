@@ -23,9 +23,9 @@ namespace Logic.Days
         {
             public int Index { get; set; }
             public List<int> Marbles { get; set; } = new List<int>() { 0 };
-            public long CurrentMarble { get; set; }
+            public int CurrentMarble { get; set; }
             public int MaxMarbleNumber { get; set; } = Test ? 6111 : 70950;
-            public HashSet<Player> Players { get; set; } = Test ? Enumerable.Range(1, 21).ToList().Select(c => new Player() { ID = c }).ToList().ToHashSet() : Enumerable.Range(1, 431).ToList().Select(c => new Player() { ID = c }).ToList().ToHashSet();
+            public Player[] Players { get; set; } = Test ? Enumerable.Range(1, 21).ToList().Select(c => new Player() { ID = c }).ToArray() : Enumerable.Range(1, 431).ToList().Select(c => new Player() { ID = c }).ToArray();
             public bool GameOver => CurrentMarble >= MaxMarbleNumber;
             public bool CountFromBeginningOfCircle => Index > Marbles.Count();
             public bool CounterClockwiseFromEndOfCircle => Index < 0;
@@ -33,25 +33,22 @@ namespace Logic.Days
 
             public void PlaceMarble(Player player)
             {
-                CurrentMarble += 1;
-                if (CurrentMarble % 23 == 0)
+                if (++CurrentMarble % 23 == 0)
                 {
-                    var score = CurrentMarble;
-                    //Take 7 indexes counterclockwise
                     Index -= 7;
-
                     if (CounterClockwiseFromEndOfCircle) Index += Marbles.Count();
-                    player.Score += Marbles[Index];
+                    player.Score += Marbles[Index] + CurrentMarble;
                     Marbles.RemoveAt(Index);
                 }
                 else
                 {
                     Index += 2;
                     if (CountFromBeginningOfCircle) Index -= Marbles.Count();
+
                     //TODO refactor
-                    Marbles.Insert((int)Index, (int)CurrentMarble);
+                    Marbles.Insert(Index, CurrentMarble);
                 }
-                if (Test) Print(player);
+                //if (Test) Print(player);
             }
         }
 
