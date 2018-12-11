@@ -11,7 +11,7 @@ namespace Logic.Days
 {
     public class AdventBase : AdventInterface
     {
-        public bool Active => Solution().Any();
+        public bool Active => Name.Length > 9;
         public int ID { get; set; }
         public string Name { get; set; }
         public object Answer1 { get; set; }

@@ -19,8 +19,8 @@ namespace XUnitTest
             {
                 var sw = new Stopwatch();
                 sw.Start();
-                var day = RenderDay.GetDay(10);
-                var check = day.Part1();
+                var day = RenderDay.GetDay(11);
+                var check = day.Part2();
                 //var day = RenderDay.GetDay(2);
                 //var check = day.Part2();
                 if (check != day.Solution()[0]) throw new Exception("Niet get goede antwoord!");
