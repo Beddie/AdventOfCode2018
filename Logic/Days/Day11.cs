@@ -16,9 +16,7 @@ namespace Logic.Days
     {
         public Day11()
         {
-            Test = true;
-            //PuzzleInput = Test ? 300 : 3628;
-
+            //Test = true;
             ID = 11;
             Name = "Day 11: Chronal Charge";
         }
@@ -26,13 +24,15 @@ namespace Logic.Days
         public override string[] Solution()
         {
             return new string[] {
+                "216,12"
+                ,"236,175,11"
             };
         }
 
         public override string Part1()
         {
             var gridSerialNumber = Test ? 18 : 3628;
-            var stride = Test ? 300 : 300;
+            var stride = 300;
             var grid = new int[stride * stride];
 
             for (int y = 1; y < stride; y++)
@@ -40,18 +40,8 @@ namespace Logic.Days
                 for (int x = 1; x < stride; x++)
                 {
                     var rackID = x + 10;
-                    int? powerLevel = (rackID * y) + gridSerialNumber;
-                    powerLevel = powerLevel * rackID;
-                    powerLevel = (powerLevel.Value / 100) % 10; // powerLevel.ToString().Reverse().Skip(2).FirstOrDefault();
-                    if (powerLevel.HasValue)
-                    {
-                        powerLevel -= 5;
-                    }
-                    else
-                    {
-                        powerLevel = 0;
-                    }
-                    grid[x + (y * stride)] = powerLevel.Value;
+                    var powerLevel = ((rackID * y) + gridSerialNumber) * rackID;
+                    grid[x + (y * stride)] = (powerLevel > 100) ? ((powerLevel / 100) % 10) - 5 : 0;
                 }
             }
 
@@ -66,29 +56,18 @@ namespace Logic.Days
             var TopLeftx = 0;
             var TopLefty = 0;
             var size = 3;
-            for (int y = 1; y < stride - 2; y++)
+            for (int y = 1; y < stride - (size - 1); y++)
             {
-                for (int x = 1; x < stride - 2; x++)
+                for (int x = 1; x < stride - (size - 1); x++)
                 {
                     var total = 0;
-
                     for (int i = 0; i < size; i++)
                     {
                         for (int j = 0; j < size; j++)
                         {
-                            total += grid[(x + i) + ((y+ j) * stride)];
+                            total += grid[(x + i) + ((y + j) * stride)];
                         }
                     }
-                    //total += grid[x + (y * stride)];
-                    //total += grid[x + 1 + (y * stride)];
-                    //total += grid[x + 2 + (y * stride)];
-                    //total += grid[x + ((y + 1) * stride)];
-                    //total += grid[x + 1 + ((y + 1) * stride)];
-                    //total += grid[x + 2 + ((y + 1) * stride)];
-                    //total += grid[x + ((y + 2) * stride)];
-                    //total += grid[x + 1 + ((y + 2) * stride)];
-                    //total += grid[x + 2 + ((y + 2) * stride)];
-
                     if (total > maxValue)
                     {
                         maxValue = total;
@@ -97,8 +76,71 @@ namespace Logic.Days
                     }
                 }
             }
-
             return $"{TopLeftx},{TopLefty}";
+        }
+
+        public override string Part2()
+        {
+            var gridSerialNumber = Test ? 18 : 3628;
+            var stride = Test ? 300 : 300;
+            var grid = new int[stride * stride];
+
+            for (int y = 1; y < stride; y++)
+            {
+                for (int x = 1; x < stride; x++)
+                {
+                    var rackID = x + 10;
+                    var powerLevel = ((rackID * y) + gridSerialNumber) * rackID;
+                    grid[x + (y * stride)] = (powerLevel > 100) ? ((powerLevel / 100) % 10) - 5 : 0;
+                }
+            }
+            Print(grid, stride);
+            return GetMaxSquare(grid, stride);
+        }
+
+        private object lockVar = new object();
+
+        private string GetMaxSquare(int[] grid, int stride)
+        {
+            var maxValue = 0;
+            var TopLeftx = 0;
+            var TopLefty = 0;
+            var gridSize = 0;
+
+            Parallel.For(1, stride, (y) =>
+            {
+                Parallel.For(1, stride, (x) =>
+                {
+                    var maxXY = x > y ? x : y;
+                    var total = 0;
+                    for (int size = 0; size < stride - maxXY; size++)
+                    {
+                        for (int edgeY = 0; edgeY < size + 1; edgeY++)
+                        {
+                            total += grid[(x + size) + ((y + edgeY) * stride)];
+                        };
+                        for (int edgeX = 0; edgeX < size; edgeX++)
+                        {
+                            total += grid[(x + edgeX) + ((y + size) * stride)];
+                        };
+
+                        if (total > 0)
+                        {
+                            lock (lockVar)
+                            {
+                                if (total > maxValue)
+                                {
+                                    maxValue = total;
+                                    TopLeftx = x;
+                                    TopLefty = y;
+                                    gridSize = size + 1;
+                                }
+                            }
+                        }
+                    };
+                });
+            });
+            return $"{TopLeftx},{TopLefty},{gridSize}";
 
         }
 
@@ -117,82 +159,6 @@ namespace Logic.Days
                 }
                 Debug.WriteLine(sb.ToString());
             }
-        }
-
-        public override string Part2()
-        {
-            var gridSerialNumber = Test ? 18 : 3628;
-            var stride = Test ? 300 : 300;
-            var grid = new int[stride * stride];
-
-            for (int y = 1; y < stride; y++)
-            {
-                for (int x = 1; x < stride; x++)
-                {
-                    var rackID = x + 10;
-                    int? powerLevel = (rackID * y) + gridSerialNumber;
-                    powerLevel = powerLevel * rackID;
-                    powerLevel = (powerLevel.Value / 100) % 10; // powerLevel.ToString().Reverse().Skip(2).FirstOrDefault();
-                    if (powerLevel.HasValue)
-                    {
-                        powerLevel -= 5;
-                    }
-                    else
-                    {
-                        powerLevel = 0;
-                    }
-                    grid[x + (y * stride)] = powerLevel.Value;
-                }
-            }
-
-            Print(grid, stride);
-            var XY = GetMaxSquare(grid, stride);
-            return XY;
-        }
-
-        private string GetMaxSquare(int[] grid, int stride)
-        {
-            var maxValue = 0;
-            var TopLeftx = 0;
-            var TopLefty = 0;
-
-            for (int size = 1; size < stride; size++)
-            {
-                for (int y = 1; y < stride - (size -1); y++)
-                {
-                    for (int x = 1; x < stride - (size -1); x++)
-                    {
-                        var total = 0;
-
-                        for (int i = 0; i < size; i++)
-                        {
-                            for (int j = 0; j < size; j++)
-                            {
-                                total += grid[(x + i) + ((y + j) * stride)];
-                            }
-                        }
-                        if (total > maxValue)
-                        {
-                            maxValue = total;
-                            TopLeftx = x;
-                            TopLefty = y;
-                        }
-                        //total += grid[x + (y * stride)];
-                        //total += grid[x + 1 + (y * stride)];
-                        //total += grid[x + 2 + (y * stride)];
-                        //total += grid[x + ((y + 1) * stride)];
-                        //total += grid[x + 1 + ((y + 1) * stride)];
-                        //total += grid[x + 2 + ((y + 1) * stride)];
-                        //total += grid[x + ((y + 2) * stride)];
-                        //total += grid[x + 1 + ((y + 2) * stride)];
-                        //total += grid[x + 2 + ((y + 2) * stride)];
-
-
-                    }
-                }
-            }
-            return $"{TopLeftx},{TopLefty}";
-
         }
     }
 }

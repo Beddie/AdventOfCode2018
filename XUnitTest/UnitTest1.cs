@@ -15,7 +15,7 @@ namespace XUnitTest
             var averageRunTime = new HashSet<long>();
 
             //Execute puzzle 100 times
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 2; i++)
             {
                 var sw = new Stopwatch();
                 sw.Start();
@@ -23,7 +23,7 @@ namespace XUnitTest
                 var check = day.Part2();
                 //var day = RenderDay.GetDay(2);
                 //var check = day.Part2();
-                if (check != day.Solution()[0]) throw new Exception("Niet get goede antwoord!");
+                if (check != day.Solution()[1]) throw new Exception("Niet get goede antwoord!");
                 //Assert.AreEqual(check, day.Solution()[1]);
                 sw.Stop();
                 averageRunTime.Add(sw.ElapsedMilliseconds);
