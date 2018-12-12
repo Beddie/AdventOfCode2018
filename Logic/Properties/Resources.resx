@@ -1532,10 +1532,54 @@ position=&lt;-3,  6&gt; velocity=&lt; 2, -1&gt;</value>
     <value />
   </data>
   <data name="Day12" xml:space="preserve">
-    <value />
+    <value>#.### =&gt; .
+###.# =&gt; #
+.##.. =&gt; .
+..### =&gt; .
+..##. =&gt; .
+##... =&gt; #
+###.. =&gt; #
+.#... =&gt; #
+##..# =&gt; #
+#.... =&gt; .
+.#.#. =&gt; .
+####. =&gt; .
+#.#.. =&gt; .
+#.#.# =&gt; .
+#..## =&gt; #
+.#### =&gt; #
+...## =&gt; .
+#..#. =&gt; #
+.#.## =&gt; #
+..#.# =&gt; #
+##.#. =&gt; #
+#.##. =&gt; #
+##### =&gt; .
+..#.. =&gt; #
+....# =&gt; .
+##.## =&gt; .
+.###. =&gt; #
+..... =&gt; .
+...#. =&gt; #
+.##.# =&gt; .
+#...# =&gt; .
+.#..# =&gt; #</value>
   </data>
   <data name="Day12Example" xml:space="preserve">
-    <value />
+    <value>...## =&gt; #
+..#.. =&gt; #
+.#... =&gt; #
+.#.#. =&gt; #
+.#.## =&gt; #
+.##.. =&gt; #
+.#### =&gt; #
+#.#.# =&gt; #
+#.### =&gt; #
+##.#. =&gt; #
+##.## =&gt; #
+###.. =&gt; #
+###.# =&gt; #
+####. =&gt; #</value>
   </data>
   <data name="Day13" xml:space="preserve">
     <value />

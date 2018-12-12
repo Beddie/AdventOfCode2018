@@ -24,12 +24,13 @@ namespace Logic.Days
         private class Game
         {
             public int Index { get; set; }
+            public int MarbleCount { get; set; } = 1;
             public List<int> Marbles { get; set; } = new List<int>() { 0 };
             public int CurrentMarble { get; set; }
             public int MaxMarbleNumber { get; set; } = Test ? 6111 : 70950;
             public Player[] Players { get; set; } = Test ? Enumerable.Range(1, 21).ToList().Select(c => new Player() { ID = c }).ToArray() : Enumerable.Range(1, 431).ToList().Select(c => new Player() { ID = c }).ToArray();
             public bool GameOver => CurrentMarble >= MaxMarbleNumber;
-            public bool CountFromBeginningOfCircle => Index > Marbles.Count();
+            public bool CountFromBeginningOfCircle => Index > MarbleCount;
             public bool CounterClockwiseFromEndOfCircle => Index < 0;
             public void Print(Player player) => Debug.WriteLine($"[{player.ID}] {String.Join("   ", Marbles).Replace($" {CurrentMarble}", $"({CurrentMarble})")}");
 
@@ -38,19 +39,20 @@ namespace Logic.Days
                 if (++CurrentMarble % 23 == 0)
                 {
                     Index -= 7;
-                    if (CounterClockwiseFromEndOfCircle) Index += Marbles.Count();
-                    player.Score += Marbles[Index] + CurrentMarble;
+                    if (CounterClockwiseFromEndOfCircle) Index += MarbleCount;
+                    player.Score += (Marbles[Index] + CurrentMarble);
                     Marbles.RemoveAt(Index);
+                    MarbleCount--;
                 }
                 else
                 {
                     Index += 2;
-                    if (CountFromBeginningOfCircle) Index -= Marbles.Count();
+                    if (CountFromBeginningOfCircle) Index -= MarbleCount;
 
                     //TODO refactor
                     Marbles.Insert(Index, CurrentMarble);
+                    MarbleCount++;
                 }
-                //if (Test) Print(player);
             }
         }
 
@@ -84,6 +86,7 @@ namespace Logic.Days
             return highScore.ToString();
         }
 
+        //TODO refactor performance
         public override string Part2()
         {
             var game = new Game();
