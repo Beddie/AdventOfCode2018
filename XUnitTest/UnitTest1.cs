@@ -19,7 +19,7 @@ namespace XUnitTest
             {
                 var sw = new Stopwatch();
                 sw.Start();
-                var day = RenderDay.GetDay(9);
+                var day = RenderDay.GetDay(13);
                 var check = day.Part1();
                 //var day = RenderDay.GetDay(2);
                 //var check = day.Part2();
