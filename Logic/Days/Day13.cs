@@ -17,28 +17,19 @@ namespace Logic.Days
         public Day13()
         {
             //Test = true;
-            PuzzleInput = Test ? puzzletest : puzzle;
+            PuzzleInput = Test ? part2puzzle : puzzle;
 
             ID = 13;
             Name = "Day 13: Mine Cart Madness";
             trackLines = PuzzleInput.Replace("\r\n", "").ToCharArray();
+            originalTrack = PuzzleInput.Replace("\r\n", "").ToCharArray();
             stride = PuzzleInput.Substring(0, PuzzleInput.IndexOf("\r\n")).Length;
-
-            //Directions.AddLast(Direction.Up);
-            //Directions.AddLast(Direction.Right);
-            //Directions.AddLast(Direction.Down);
-            //Directions.AddLast(Direction.Left);
-
-            //DirectionMemory.AddLast(Direction.Left);
-            //DirectionMemory.AddLast(Direction.Straight);
-            //DirectionMemory.AddLast(Direction.Right);
-
         }
 
+        private static char[] trackLines { get; set; }
+        private static char[] originalTrack { get; set; }
         public static List<Direction> Directions = new List<Direction> { Direction.Up, Direction.Right, Direction.Down, Direction.Left };
         public static List<Direction> DirectionMemory = new List<Direction> { Direction.Left, Direction.Straight, Direction.Right };
-
-        private int index = 0;
 
         public static Direction nextDirection(Direction direction)
         {
@@ -47,7 +38,6 @@ namespace Logic.Days
                 index += 1;
             else
                 index = 0;
-
             return Directions[index];
         }
 
@@ -58,7 +48,6 @@ namespace Logic.Days
                 index -= 1;
             else
                 index = Directions.Count - 1;
-
             return Directions[index];
         }
         public static Direction nextMemory(Direction direction)
@@ -68,13 +57,14 @@ namespace Logic.Days
                 index += 1;
             else
                 index = 0;
-
             return DirectionMemory[index];
         }
 
         public override string[] Solution()
         {
             return new string[] {
+                "80,100",
+                ""
             };
         }
 
@@ -86,10 +76,6 @@ namespace Logic.Days
             Left = 4,
             Straight = 5
         }
-
-
-        //private static LinkedList<Direction> Directions = new LinkedList<Direction>();
-        //private static LinkedList<Direction> DirectionMemory = new LinkedList<Direction>();
 
         public class Cart
         {
@@ -129,8 +115,9 @@ namespace Logic.Days
             public int Index { get; set; }
             private char previousTrack { get; set; }
             private void TurnRight() { }
+            private bool findFirstCrash = false;
 
-            public bool Move()
+            public int? Move()
             {
                 var currentIndex = Index;
 
@@ -140,7 +127,9 @@ namespace Logic.Days
 
                 if ("<>^v".Contains(currentTrackSpecification))
                 {
-                    return true;
+                    trackLines[Index] = originalTrack[Index];
+                    trackLines[currentIndex] = originalTrack[currentIndex];
+                    return Index;
                 }
 
                 switch (currentTrackSpecification)
@@ -157,10 +146,10 @@ namespace Logic.Days
                             switch (MemoryDirection)
                             {
                                 case Direction.Right:
-                                    FacingDirection = horizontal ? previousDirection(FacingDirection) : nextDirection(FacingDirection);
+                                    FacingDirection = nextDirection(FacingDirection);
                                     break;
                                 case Direction.Left:
-                                    FacingDirection = horizontal ? nextDirection(FacingDirection) : previousDirection(FacingDirection);
+                                    FacingDirection = previousDirection(FacingDirection);
                                     break;
                                 default:
                                     throw new NotSupportedException();
@@ -174,7 +163,7 @@ namespace Logic.Days
                 trackLines[currentIndex] = previousTrack;
                 trackLines[Index] = GetCartChar();
                 previousTrack = currentTrackSpecification;
-                return false;
+                return null;
             }
 
             private char GetCartChar()
@@ -212,7 +201,7 @@ namespace Logic.Days
             }
         }
 
-        private static char[] trackLines { get; set; }
+
         public static int stride { get; set; }
 
         public override string Part1()
@@ -224,16 +213,15 @@ namespace Logic.Days
             {
                 foreach (var Cart in Carts)
                 {
-                    if (Cart.Move()) {
+                    if (Cart.Move().HasValue)
+                    {
                         crash = true;
                         coordinates = GetCoordinates(Cart.Index);
                     };
                 }
                 Print();
             }
-
-
-            return "";
+            return coordinates;
         }
 
         private string GetCoordinates(int index)
@@ -243,7 +231,8 @@ namespace Logic.Days
             {
                 for (int x = 0; x < stride; x++)
                 {
-                    if (index == (x + (y * stride))) {
+                    if (index == (x + (y * stride)))
+                    {
                         return $"{x},{y}";
                     };
                 }
@@ -253,32 +242,46 @@ namespace Logic.Days
 
         private void Print()
         {
-           // if (Test)
-           // {
-                var ystride = trackLines.Length / stride;
-                var sb = new StringBuilder();
-                for (int y = 0; y < ystride; y++)
+            // if (Test)
+            // {
+            var ystride = trackLines.Length / stride;
+            var sb = new StringBuilder();
+            for (int y = 0; y < ystride; y++)
+            {
+                for (int x = 0; x < stride; x++)
                 {
-                    for (int x = 0; x < stride; x++)
-                    {
-                        sb.Append(trackLines[x + (y * stride)]);
-                    }
-                    sb.AppendLine();
+                    sb.Append(trackLines[x + (y * stride)]);
                 }
-                Debug.WriteLine(sb.ToString());
-           // }
+                sb.AppendLine();
+            }
+            Debug.WriteLine(sb.ToString());
         }
-
-        private void Tick(Cart cart)
-        {
-
-
-        }
-
 
         public override string Part2()
         {
-            return "";
+            var Carts = PuzzleInput.Replace("\r\n", "").Select((c, index) => new { c, index }).Where(d => d.c == '>' || d.c == 'v' || d.c == '<' || d.c == '^').Select((e, eindex) => new Cart(e.index, e.c, eindex + 1)).ToList();
+            var coordinates = string.Empty;
+            var crash = false;
+            while (!crash)
+            {
+                List<int> cartsTobeRemoved = new List<int>();
+                foreach (var Cart in Carts)
+                {
+                    if (Cart.Move().HasValue)
+                    {
+                        cartsTobeRemoved.AddRange(Carts.Where(c => c.Index == Cart.Index).Select(c => c.ID).ToList());
+                    };
+                }
+
+                Carts.RemoveAll(c => cartsTobeRemoved.Contains(c.ID));
+                if (Carts.Count == 1)
+                {
+                    coordinates = GetCoordinates(Carts.First().Index);
+                    crash = true; //66,45 not correct en 65,45 not correct
+                }
+                if (Test) Print();
+            }
+            return coordinates;
         }
 
 
@@ -438,9 +441,26 @@ namespace Logic.Days
            |       \---+-----------------+------/                     |  |     |                  |             |                        |     |      
            |           |                 |                            \--+-----/                  \-------------+------------------------+-----/      
            \-----------+-----------------+-------------------------------+--------------------------------------/                        |            
-                       \-----------------/                               \---------------------------------------------------------------/             ";
+                       \-----------------/                               \---------------------------------------------------------------/            ";
 
+        private string ttpuzzle = @"| | |   || || |  || | /-+-+++--++--+-+--+-+----+-+---+-++-+--+-++--++-++--+\|||| /++--++-+----+-----+++--\||  ||||    |  || |||\+++--+++--+---+/ |   |
+| | |   || || |  v| | | | |||  ||  | |  | |    | |   | || \--+-++--++-++--++++++-+++--++-+----/     |||  |||  ||||    |  || ||| |||  |||  |   |  |   |
+| | |   || |\-+--++-+-+-+-+++--++--+-+--+-+----+-+---+-++----+-++--++-++--++++++-+/|  || |          |||  |||  ||||    |  || ||| |||  |||  |   |  |   |
+| | |   || |/-+--++-+-+-+-+++--++--+-+--+-+----+-+---+-++----+-++--++-++--++++++-+-+--++-+---\      |||  |||  ||||    |  || ||| |||  |||  |   |  |   |
+| | |   || ||/+--++-+-+-+-+++--++--+-+\ | |    | |/--+-++----+-++--++-++--++++++-+-+--++-+---+-\    |||  |||  ||||    |  || ||| |||  |||  |   |  |   |
+| | |   || ||||  || | | | |||  ||  | || | |  /-+-++--+-++----+-++--++-++--++++++-+-+--++-+---+-+----+++--+++--++++----+--++-+++-+++--+++--+---+\ |   |
+| | | /-++-++++--++-+-+-+-+++--++--+\|| | |  | | ||  | ||    | ||  || ||  |||||\-+-+--++-+---+-+----+++--+++--++++----+--++-+/| |||  |||  |   || |   |
+| | | | || ||||  || | | | |||  ||  |||| | |  | | ||  | \+----+-++--++-++--+++++--+-+--++-+---+-+----+++--+++--++++----+--++-+-+-+++--++/  |   || |   |
+| | | | ||/++++--++-+-+-+-+++--++--++++-+-+--+-+-++--+--+----+-++--+^-++--+++++--+-+--++-+---+-+-\  |||  |||  ||||    |  ||/+-+-+++--++---+--\|| |   |
+| | | | |||||||  || | | | |||  ||  ||||/+-+--+-+-++--+--+----+-++--++-++--+++++--+-+--++-+--\| | |  |||  |||  ||||    |  |||| | |||  ||   |  ||| |   |";
 
+        private string part2puzzle = @"/>-<\  
+|   |  
+| /<+-\
+| | | v
+\>+</ |
+  |   ^
+  \<->/ ";
     }
 }
 
