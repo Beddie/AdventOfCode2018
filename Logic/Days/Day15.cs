@@ -1,17 +1,12 @@
-﻿using Logic.Interface;
-using Logic.Properties;
+﻿using Logic.Properties;
 using Logic.Service.Pathfinder;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace Logic.Days
 {
@@ -20,99 +15,90 @@ namespace Logic.Days
         public Day15()
         {
             Test = true;
-            //PuzzleInput = @"#######
-            //                #.G...#
-            //                #.....#
-            //                #.#.###
-            //                #...#E#
-            //                #.....#
-            //                #######";
-
-            //PuzzleInput = @"#######
-            //                #....G#
-            //                #..G..#
-            //                #.#.###
-            //                #...#E#
-            //                #.....#
-            //                #######";
-            //PuzzleInput = @"#######
-            //          #G..#E#
-            //          #E#E.E#
-            //          #G.##.#
-            //          #...#E#
-            //          #...E.#
-            //          #######";
-
-            PuzzleInput = @"#######
-                            #E.G#.#
-                            #.#G..#
-                            #G.#.G#
-                            #G..#.#
-                            #...E.#
-                            #######";
-
-            //PuzzleInput = Test ? Resources.Day15Example : Resources.Day15;
+            PuzzleInput = Test ? Resources.Day15Example : Resources.Day15;
             ID = 15;
             Name = "Day 15: Beverage Bandits";
         }
 
         public override string[] Solution()
         {
-            return new string[] {
-            };
+            return new string[] { "269430", "55160" };
         }
-
 
         public override string Part1()
         {
             var game = new Game(PuzzleInput);
             while (!game.GameOver)
             {
-                game.FullRoundNumber++;
                 game.Round();
-                game.PrintGame();
+                if (!game.GameOver) game.FullRoundNumber++;
+                if (Test) game.PrintGame(true);
             }
-            Debug.WriteLine(game.Part1);
-
-            return game.Part1.ToString();
+            return game.Part1and2.ToString();
         }
 
+        public override string Part2()
+        {
+            var attackPower = 3;
+            var elfsSurvive = false;
+            var score = 0;
+            while (!elfsSurvive)
+            {
+                attackPower++;
+                var game = new Game(PuzzleInput, attackPower);
 
+                while (!game.GameOver)
+                {
+                    game.Round();
+                    if (!game.GameOver) game.FullRoundNumber++;
+                }
+
+                if (game.AllElfsLeft)
+                {
+                    elfsSurvive = true;
+                    score = (int)game.Part1and2;
+                }
+            }
+            return score.ToString();
+        }
 
         private class Game
         {
-            public Game(string puzzleInput)
+            public Game(string puzzleInput, int? attackPowerPart2 = null)
             {
+                ElfAttackPower = attackPowerPart2.HasValue ? attackPowerPart2.Value : 3;
                 Stride = puzzleInput.Substring(0, puzzleInput.IndexOf("\r\n")).Count();
                 GameObjects = puzzleInput.Replace("\r\n", "").Replace(" ", "").Select((c, index) => CreateGameObject(c, index)).ToList();
+                AmountElfsStart = GameObjects.Where(WhereUnitIsElf()).Count();
             }
 
-            public bool GameOver => !GameObjects.Where(whereUnitIsGoblin()).Any() || !GameObjects.Where(whereUnitIsElf()).Any();
-            public double Part1 => (FullRoundNumber) * TotalUnitHp;
+            public int AmountElfsStart { get; set; }
+            public int ElfAttackPower { get; set; }
+            public int FullRoundNumber { get; set; }
+            public bool GameOver => !GameObjects.Where(WhereUnitIsGoblin()).Any() || !GameObjects.Where(WhereUnitIsElf()).Any();
+            public bool AllElfsLeft => GameObjects.Where(WhereUnitIsElf()).Count() == AmountElfsStart;
+            public double Part1and2 => (FullRoundNumber) * TotalUnitHp;
+            public void PrintGame(bool scores) { Print(scores); }
+
             public static int Stride { get; set; }
             public static List<GameObject> GameObjects { get; set; }
-            public void PrintGame() { Print(); }
-            public delegate Func<GameObject, bool> WhereGameObject();
-            public delegate Func<GameObject, Unit> SelectUnit();
-
-            public static Func<GameObject, Unit> selectUnit() => (o) => (o as Unit);
-            public static Func<GameObject, bool> whereUnitObjects = (o => o is Unit);
-            public static Func<GameObject, bool> whereUnitIsElf() => c => (c is Unit) && (c as Unit).Type == UnitType.Elf;
-            public static Func<GameObject, bool> whereUnitIsGoblin() => c => (c is Unit) && (c as Unit).Type == UnitType.Goblin;
-            public static Func<GameObject, bool> whereAdjacentOpenCavern(Point index) => c => IsAdjacent(c.Index, index) && (c is Structure) && (c as Structure).Type == StructureType.OpenCavern;
-            public static Func<GameObject, bool> whereOpenCavern() => c => c is Structure && (c as Structure).Type == StructureType.OpenCavern;
+            public static Func<GameObject, Unit> SelectUnits() => (o) => (o as Unit);
+            public static Func<GameObject, bool> WhereUnitObjects = (o => o is Unit);
+            public static Func<GameObject, bool> WhereUnitIsElf() => c => (c is Unit) && (c as Unit).Type == UnitType.Elf;
+            public static Func<GameObject, bool> WhereUnitIsGoblin() => c => (c is Unit) && (c as Unit).Type == UnitType.Goblin;
+            public static Func<GameObject, bool> WhereAdjacentOpenCavern(Point index) => c => IsAdjacent(c.Index, index) && (((c is Structure) && (c as Structure).Type == StructureType.OpenCavern) || ((c is Unit) && (c as Unit).Dead));
             public static sbyte[,] direction = new sbyte[4, 2] { { 0, -1 }, { 1, 0 }, { 0, 1 }, { -1, 0 } };
 
-            public int FullRoundNumber { get; set; }
-            private int TotalUnitHp => GameObjects.Where(whereUnitObjects).Select(selectUnit()).Sum(e => e.HP);
+            public delegate Func<GameObject, bool> WhereGameObject();
+
+            private int TotalUnitHp => GameObjects.Where(WhereUnitObjects).Select(SelectUnits()).Sum(e => e.HP);
 
             public void Round()
             {
-                foreach (var unit in GameObjects.Where(whereUnitObjects).OrderBy(c => c.Index.Y).ThenBy(c => c.Index.X).Select(selectUnit()))
+                foreach (var unit in GameObjects.Where(WhereUnitObjects).OrderBy(c => c.Index.Y).ThenBy(c => c.Index.X).Select(SelectUnits()).Where(c => !c.Dead))
                 {
                     unit.Act();
                 }
-                Debug.WriteLine(FullRoundNumber);
             }
 
             public static bool IsAdjacent(Point fromindex, Point relatedIndex) =>
@@ -133,9 +119,9 @@ namespace Logic.Days
                     case '.':
                         return new Structure() { Type = StructureType.OpenCavern, Index = newIndex };
                     case 'E':
-                        return new Unit(UnitType.Elf, whereUnitIsGoblin) { Index = newIndex };
+                        return new Unit(UnitType.Elf, WhereUnitIsGoblin) { Index = newIndex, Power = ElfAttackPower };
                     case 'G':
-                        return new Unit(UnitType.Goblin, whereUnitIsElf) { Index = newIndex };
+                        return new Unit(UnitType.Goblin, WhereUnitIsElf) { Index = newIndex };
                     default:
                         throw new FormatException("Unknown gameObject");
                 }
@@ -148,7 +134,9 @@ namespace Logic.Days
 
             public enum UnitType
             {
+                [Description("Elf")]
                 Elf = 1,
+                [Description("Goblin")]
                 Goblin = 2
             }
 
@@ -174,32 +162,48 @@ namespace Logic.Days
                 public UnitType Type { get; set; }
                 public WhereGameObject Enemies { get; set; }
                 public int HP { get; set; } = 200;
-                private int Power { get; set; } = 3;
-
+                public int Power { get; set; } = 3;
                 public List<Point> IndexRanges => GetAdjacentOpenCavernForUnit();
-                public bool Dead => HP < 0;
+                public bool Dead => HP <= 0;
 
                 public void Act()
                 {
-                    //find enemies
-                    var enemies = GameObjects.Where(Enemies()).Select(selectUnit());
-                    //FIndclosest Enemy
-                    FightOrWalkToFirstEnemyBattleGround(enemies.ToList());
+                    if (!Dead)
+                    {
+                        //find enemies
+                        var enemies = GameObjects.Where(Enemies()).Select(SelectUnits()).Where(c => !c.Dead);
+                        //Find closest enemy and walk or battle
+                        FightOrWalkToFirstEnemyBattleGround(enemies.ToList());
+                    }
                 }
 
-                public List<Unit> GetAdjacentBattleUnitsForUnit(Point? index = null)
+                private List<Unit> GetAdjacentBattleUnitsForUnit(Point? index = null)
                 {
-                    var battleUnit = GameObjects.Where(Enemies()).Where(c => IsAdjacent(Index, c.Index)).Select(selectUnit()).ToList();
+                    var battleUnit = GameObjects.Where(Enemies()).Where(c => IsAdjacent(Index, c.Index)).Select(SelectUnits()).Where(c => !c.Dead).ToList();
                     return battleUnit.Any() ? battleUnit : new List<Unit>();
                 }
 
                 private List<Point> GetAdjacentOpenCavernForUnit(Point? index = null)
                 {
-                    var openCavern = GameObjects.Where(whereAdjacentOpenCavern(index.HasValue ? index.Value : Index)).Select(c => c.Index).ToList();
+                    var openCavern = GameObjects.Where(WhereAdjacentOpenCavern(index.HasValue ? index.Value : Index)).Select(c => c.Index).ToList();
                     return openCavern.Any() ? openCavern : new List<Point>();
                 }
 
-                private (Point, Unit) FindPathsAndDetermineFastestPathToEnemy(List<Point> adjacentSquares, List<Unit> enemyList)
+                private class EnemyPath
+                {
+                    public EnemyPath(Point point, Unit enemy, List<PathFinderNode> path)
+                    {
+                        Point = point;
+                        Enemy = enemy;
+                        Path = path;
+                    }
+
+                    public Point Point { get; set; }
+                    public Unit Enemy { get; set; }
+                    public List<PathFinderNode> Path { get; set; }
+                }
+
+                private List<EnemyPath> FindPathsAndDetermineFastestPathToEnemy(List<Point> adjacentSquares, List<Unit> enemyList)
                 {
                     //build grid
                     var maxX = GameObjects.Max(c => c.Index.X);
@@ -208,56 +212,53 @@ namespace Logic.Days
 
                     GameObjects.ForEach((go) =>
                     {
-                        grid[go.Index.X, go.Index.Y] = (enemyList.Contains(go) || (((go is Structure) && (go as Structure).Type == StructureType.OpenCavern))) ? (byte)1 : (byte)0;
+                        grid[go.Index.X, go.Index.Y] = ((((go is Structure) && (go as Structure).Type == StructureType.OpenCavern)) || (((go is Unit) && (go as Unit).Dead))) ? (byte)1 : (byte)0;
 
                     });
-                    //PrintGrid(grid);
-                    List<PathFinderNode> shortestPath = null;
-                    Unit choosenEnemy = null;
+                    List<EnemyPath> enemyPaths = new List<EnemyPath>();
                     foreach (var square in adjacentSquares)
                     {
                         foreach (var enemy in enemyList)
                         {
-                            var mPathFinder = new PathFinder(grid);
-                            List<PathFinderNode> path = mPathFinder.FindPath(square, enemy.Index); //Dont use last column! or last row!
-
-                            if (path != null)
+                            foreach (var indexInRange in enemy.IndexRanges)
                             {
-                                //PrintPath(grid, path);
-                                if (shortestPath == null || shortestPath.Count() > path.Count())
-                                {
-                                    shortestPath = path;
-                                    choosenEnemy = enemy;
-                                }
+                                var mPathFinder = new PathFinder(grid);
+                                List<PathFinderNode> path = mPathFinder.FindPath(square, indexInRange);
+                                if (path != null) enemyPaths.Add(new EnemyPath(new Point(path.First().X, path.First().Y), enemy, path));
                             }
                         }
                     }
-                    return choosenEnemy == null ? (new Point(), null) : (new Point(shortestPath.First().X, shortestPath.First().Y), choosenEnemy);
+                    return enemyPaths?? null;
                 }
 
                 private void FightOrWalkToFirstEnemyBattleGround(List<Unit> enemyList)
                 {
-                    var openQuares = GetAdjacentOpenCavernForUnit().OrderBy(c => c.Y).ThenBy(c => c.X).ToList(); // => new Path(index + 1, c));
-                    var battleUnits = GetAdjacentBattleUnitsForUnit().OrderBy(c => c.Index.Y).ThenBy(c => c.Index.X); // => new Path(index + 1, c));
-                    if (battleUnits.Any()) Fight(battleUnits);
+                    var openQuares = GetAdjacentOpenCavernForUnit().OrderBy(c => c.Y).ThenBy(c => c.X).ToList();
+                    var battleUnits = GetAdjacentBattleUnitsForUnit().Where(c => !c.Dead).OrderBy(c => c.Index.Y).ThenBy(c => c.Index.X);
+                    if (battleUnits.Any()) Fight(battleUnits.ToList());
                     else
                     {
-                        var PointUnit = FindPathsAndDetermineFastestPathToEnemy(openQuares.ToList(), enemyList);
+                        var enemyPaths = FindPathsAndDetermineFastestPathToEnemy(openQuares.ToList(), enemyList);
                         //Swap by ref
-                        if (PointUnit.Item2 != null)
+                        if (enemyPaths != null && enemyPaths.Any())
                         {
-                            var opensquare = GameObjects.First(c => c.Index == PointUnit.Item1);
-                            opensquare.Index = Index;
-                            Index = PointUnit.Item1;
-                            battleUnits = GetAdjacentBattleUnitsForUnit().OrderBy(c => c.Index.Y).ThenBy(c => c.Index.X);
-                            if (battleUnits.Any()) Fight(battleUnits);
+                            var shortestPaths = enemyPaths.Where(c => c.Path.Count == enemyPaths.Min(d => d.Path.Count())).ToList();
+                            var shortestPathToUnit = shortestPaths.OrderBy(c => c.Path.Last().Y).ThenBy(c => c.Path.Last().X).First();
+                            var opensquare = GameObjects.First(c => c.Index == shortestPathToUnit.Point);
+                            opensquare.Index = new Point(Index.X, Index.Y);
+                            Index = shortestPathToUnit.Point;
+                            battleUnits = GetAdjacentBattleUnitsForUnit().Where(c => !c.Dead).OrderBy(c => c.Index.Y).ThenBy(c => c.Index.X);
+                            if (battleUnits.Any()) Fight(battleUnits.ToList());
                         }
                     }
                 }
 
-                private void Fight(IOrderedEnumerable<Unit> battleUnits)
+                private void Fight(List<Unit> battleUnits)
                 {
-                    var enemyWithLowestHP = battleUnits.Where(c => c.HP == battleUnits.Min(d => d.HP)).First();
+                    Unit enemyWithLowestHP;
+                    var enemyWithLowestHPs = battleUnits.Where(c => c.HP == battleUnits.Min(d => d.HP)).ToList();
+
+                    enemyWithLowestHP = enemyWithLowestHPs.OrderBy(c => c.Index.Y).ThenBy(c => c.Index.X).First();
                     enemyWithLowestHP.HP -= Power;
 
                     if (enemyWithLowestHP.Dead)
@@ -314,16 +315,16 @@ namespace Logic.Days
                 }
             }
 
-            private void Print()
+            private void Print(bool scores)
             {
                 var sb = new StringBuilder();
                 var maxX = GameObjects.Max(c => c.Index.X);
                 var maxY = GameObjects.Max(c => c.Index.Y);
                 var y = 0;
+
+                var units = GameObjects.Where(WhereUnitObjects).Select(SelectUnits()).OrderBy(c => c.Index.Y).ThenBy(c => c.Index.X).ToList();
                 foreach (var item in GameObjects.OrderBy(c => c.Index.Y).ThenBy(c => c.Index.X))
                 {
-                    //count++;
-                    //if (item.Index.X == 0 && item.Index.Y > 0) sb.AppendLine();
                     var printChar = '/';
                     if (item is Structure && (item as Structure).Type == StructureType.Wall) printChar = '#';
                     else if (item is Structure && (item as Structure).Type == StructureType.OpenCavern) printChar = '.';
@@ -331,19 +332,28 @@ namespace Logic.Days
                     else if (item is Unit && (item as Unit).Type == UnitType.Goblin) printChar = 'G';
 
 
-                    if (y != item.Index.Y) { sb.AppendLine(); y++; };
+                    if (y != item.Index.Y)
+                    {
+                        if (units.Count() > y) sb.Append($"    {EnumUnits[(int)units[y].Type]} - {units[y].HP}");
+                        sb.AppendLine();
+                        y++;
+                    };
                     sb.Append(printChar);
-
                 }
+
+                while (units.Count() > y)
+                {
+                    sb.AppendLine($"    {EnumUnits[(int)units[y].Type]} - {units[y].HP}");
+                    y++;
+                }
+                sb.AppendLine();
+
                 Debug.WriteLine(sb.ToString());
             }
-            #endregion
-        }
 
-        public override string Part2()
-        {
-            return "";
+            private Dictionary<int, string> EnumUnits = EnumDictionary<UnitType>();
+
+            #endregion
         }
     }
 }
-
