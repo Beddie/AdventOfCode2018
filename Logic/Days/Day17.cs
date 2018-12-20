@@ -1,15 +1,9 @@
-﻿using Logic.Interface;
-using Logic.Properties;
+﻿using Logic.Properties;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Logic.Days
 {
@@ -27,6 +21,7 @@ namespace Logic.Days
         public override string[] Solution()
         {
             return new string[] {
+                "30635", ""
             };
         }
 
@@ -69,7 +64,7 @@ namespace Logic.Days
             var gridXmax = pixels.Max(c => c.X);
             var gridYmax = pixels.Max(c => c.Y) + 1;
 
-            var grid = new int[860, gridYmax];
+            var grid = new int[gridXmax + 2, gridYmax];
             var pixelHashset = pixels.ToHashSet();
             for (int y = 0; y < gridYmax; y++)
             {
@@ -92,13 +87,16 @@ namespace Logic.Days
             {
                 tellen++;
                 dropsOfWater.RemoveAll(c => c.Dead);
-                //check current water position (start grid[500, 0])
 
-                if (tellen > 887) //126
+
+                var doubles = dropsOfWater.GroupBy(c => new { c.X, c.Y }).Where(c => c.Count() > 1);
+                foreach (var db in doubles)
                 {
-                    Print(grid, 420, 700, 400, 440);
-                    // debug = true;
+                    dropsOfWater.Remove(dropsOfWater.Where(c => c.X == db.Key.X && c.Y == db.Key.Y).First());
                 }
+
+
+
                 for (int i = 0; i < dropsOfWater.Count; i++)
                 {
                     var droppingWater = dropsOfWater[i];
@@ -116,7 +114,11 @@ namespace Logic.Days
                                 FillHorizontal(grid, dropsOfWater, droppingWater, debug);
                                 break;
                             case '~':
-                                FillHorizontal(grid, dropsOfWater, droppingWater);
+                                if (!IsStandingWater(grid, dropsOfWater, droppingWater))
+                                {
+                                    droppingWater.Die();
+                                }
+                                else FillHorizontal(grid, dropsOfWater, droppingWater);
                                 break;
                             case '.':
                                 droppingWater.Y++;
@@ -134,20 +136,86 @@ namespace Logic.Days
 
                 }
 
+
             }
-            Print(grid);
+            Print(grid); //589
             //Spring lives at x=500,y=0
+            return CountWater(grid);
+        }
 
-            string part1 = CountWater(grid);
+        private bool IsStandingWater(int[,] grid, List<Pixel> dropsOfWater, Pixel droppingWater)
+        {
+            //scan line below
+            //Dermine all X values to scan
+            int? scanLeftX = null;
+            int? scanRightX = null;
+            var standingLeft = false;
+            var standingRight = false;
+            var originalScanX = droppingWater.X;
+            var originalScanY = droppingWater.Y;
 
+            droppingWater.Y++;
 
-            return "";
+            while (!scanLeftX.HasValue)
+            {
+                if (grid[droppingWater.X - 1, droppingWater.Y] == '~')
+                {
+                }
+                else if (grid[droppingWater.X - 1, droppingWater.Y] == '#')
+                {
+                    standingLeft = true;
+                }
+                else
+                {
+                    scanLeftX = droppingWater.X;
+                }
+
+                droppingWater.X--;
+            }
+            droppingWater.X = originalScanX;
+            while (!scanRightX.HasValue)
+            {
+                if (grid[droppingWater.X + 1, droppingWater.Y] == '~')
+                {
+                }
+                else if (grid[droppingWater.X + 1, droppingWater.Y] == '#')
+                {
+                    standingRight = true;
+                }
+                else
+                {
+                    scanRightX = droppingWater.X;
+                }
+
+                droppingWater.X++;
+            }
+            droppingWater.X = originalScanX;
+            droppingWater.Y = originalScanY;
+
+            return standingLeft && standingRight;
         }
 
         private string CountWater(int[,] grid)
         {
             var count = 0;
+
+            //Start counting from first Y with #
+            //Start counting from first Y with #
+            var firstY = (int?)null;
             for (int y = 0; y < grid.GetLength(1); y++)
+            {
+                for (int x = 0; x < grid.GetLength(0); x++)
+                {
+                    var gridVal = grid[x, y];
+                    if (gridVal != 0)
+                    {
+                        if (!firstY.HasValue && gridVal == '#') firstY = y;
+                    }
+
+                }
+            }
+
+            for (int y = firstY.Value; y < grid.GetLength(1); y++)
             {
                 for (int x = 0; x < grid.GetLength(0); x++)
                 {
@@ -171,7 +239,6 @@ namespace Logic.Days
             var originalY = droppingWater.Y;
 
             //Check if standing water is old standing water.
-
             grid[droppingWater.X, droppingWater.Y] = '~';
             while (goHorizontalLeft)
             {
@@ -185,13 +252,11 @@ namespace Logic.Days
                 }
                 else if ((nextLeft == '|') && nextLeftSurface != '.')
                 {
-                    grid[droppingWater.X - 1, droppingWater.Y] = '~';
                     droppingWater.X--;
-                    if (dropsOfWater.Any(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y))
+                    if (!dropsOfWater.Any(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y))
                     {
-                        dropsOfWater.Where(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y).ToList().ForEach(c => c.Die());
+                        grid[droppingWater.X, droppingWater.Y] = '~';
                     }
-
                 }
                 else if (nextLeftSurface == '.')
                 {
@@ -206,10 +271,7 @@ namespace Logic.Days
             }
             var goHorizontalRight = true;
             droppingWater.X = originalX;
-            if (debug)
-            {
-                Print(grid, 450, 550, 80);
-            }
+
             while (goHorizontalRight)
             {
                 var nextRight = grid[droppingWater.X + 1, droppingWater.Y];
@@ -221,11 +283,10 @@ namespace Logic.Days
                 }
                 else if ((nextRight == '|') && nextRightSurface != '.')
                 {
-                    grid[droppingWater.X + 1, droppingWater.Y] = '~';
                     droppingWater.X++;
-                    if (dropsOfWater.Any(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y))
+                    if (!dropsOfWater.Any(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y))
                     {
-                        dropsOfWater.Where(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y).ToList().ForEach(c => c.Die());
+                        grid[droppingWater.X, droppingWater.Y] = '~';
                     }
                 }
                 else if (nextRightSurface == '.')
@@ -251,8 +312,6 @@ namespace Logic.Days
             {
                 if (!droppingWater.Dead)
                 {
-                    //Find | in line above (width = distance between #....#  TODO) and set coordinates to this line!
-
                     //Dermine all X values to scan
                     int? scanLeftX = null;
                     int? scanRightX = null;
@@ -267,10 +326,6 @@ namespace Logic.Days
                             scanLeftX = droppingWater.X;
 
                         }
-                        if (dropsOfWater.Any(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y))
-                        {
-                            dropsOfWater.Where(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y).ToList().ForEach(c => c.Die());
-                        }
                         droppingWater.X--;
                     }
                     droppingWater.X = originalScanX;
@@ -282,16 +337,9 @@ namespace Logic.Days
                             scanRightX = droppingWater.X;
 
                         }
-                        if (dropsOfWater.Any(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y))
-                        {
-                            dropsOfWater.Where(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y).ToList().ForEach(c => c.Die());
-                        }
                         droppingWater.X++;
                     }
 
-                    //Kill other existing drops on the same line?
-
-                    //Find |
                     for (int scanx = scanLeftX.Value; scanx <= scanRightX; scanx++)
                     {
                         if (grid[scanx, droppingWater.Y - 1] == '|')
@@ -302,45 +350,20 @@ namespace Logic.Days
                             break;
                         }
                     }
+
+                    if (found)
+                    {
+
+                        for (int scanx = scanLeftX.Value; scanx <= scanRightX; scanx++)
+                        {
+                            if (dropsOfWater.Any(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y + 1))
+                            {
+                                dropsOfWater.Where(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y + 1).ToList().ForEach(c => c.Die());
+                            }
+                        }
+                    }
                 }
-            }
-            ;
-            //if (nextTopStop) {
-            //    //find stream (scan)
-            //    var scanLeft = true;
-            //    var scanRight = true;
-            //    var found = false;
-            //    var originalScanX = droppingWater.X;
-            //    while (scanLeft)
-            //    {
-            //        droppingWater.X--;
-            //        if (grid[droppingWater.X, droppingWater.Y - 1] == '|')
-            //        {
-            //            found = true;
-            //            scanLeft = false;
-            //        }
-            //        else if (grid[droppingWater.X, droppingWater.Y - 1] == '#')
-            //        {
-            //            scanLeft = false;
-
-            //        }
-            //    }
-            //    while (scanRight && !found)
-            //    {
-            //        droppingWater.X++;
-            //        if (grid[droppingWater.X, droppingWater.Y - 1] == '|')
-            //        {
-            //            found = true;
-            //            scanRight = false;
-            //        }
-            //        else if (grid[droppingWater.X, droppingWater.Y - 1] == '#')
-            //        {
-            //            scanLeft = false;
-            //        }
-            //    }
-            //}
-
-
+            };
         }
 
         private void Print(int[,] grid, int firstX = 0, int lastX = 0, int firstY = 0, int lastY = 0)
@@ -362,7 +385,99 @@ namespace Logic.Days
 
         public override string Part2()
         {
-            return "";
+            var gridDefinition = PuzzleInput.Split(new[] { "\r\n" }, StringSplitOptions.None).Select(c => c.Split(new[] { ", ", "=", ".." }, StringSplitOptions.None));
+
+            //Create list of pixels
+            var pixels = new List<Pixel>();
+            foreach (var definition in gridDefinition)
+            {
+                var a = definition[0];
+                var aVal = Convert.ToInt32(definition[1]);
+                var b = definition[2];
+                var bValFrom = Convert.ToInt32(definition[3]);
+                var bValTo = Convert.ToInt32(definition[4]);
+
+                for (int i = bValFrom; i <= bValTo; i++) pixels.Add((a == "x") ? new Pixel(aVal, i) : new Pixel(i, aVal));
+            }
+
+            var gridXmin = pixels.Min(c => c.X);
+            var gridXmax = pixels.Max(c => c.X);
+            var gridYmax = pixels.Max(c => c.Y) + 1;
+
+            var grid = new int[gridXmax + 2, gridYmax];
+            var pixelHashset = pixels.ToHashSet();
+            for (int y = 0; y < gridYmax; y++)
+            {
+                for (int x = 0; x <= gridXmax; x++)
+                {
+                    grid[x, y] = '.';
+                }
+            }
+            foreach (var pix in pixelHashset)
+            {
+                grid[pix.X, pix.Y] = '#';
+            }
+
+            grid[500, 0] = '+';
+            var dropsOfWater = new List<Pixel> { new Pixel(500, 0) };
+            var gameOver = gridYmax;
+            var tellen = 0;
+            var debug = false;
+            while (dropsOfWater.Any())
+            {
+                tellen++;
+                dropsOfWater.RemoveAll(c => c.Dead);
+
+
+                var doubles = dropsOfWater.GroupBy(c => new { c.X, c.Y }).Where(c => c.Count() > 1);
+                foreach (var db in doubles)
+                {
+                    dropsOfWater.Remove(dropsOfWater.Where(c => c.X == db.Key.X && c.Y == db.Key.Y).First());
+                }
+
+                for (int i = 0; i < dropsOfWater.Count; i++)
+                {
+                    var droppingWater = dropsOfWater[i];
+
+                    if (droppingWater.Y + 1 == gameOver) droppingWater.Die();
+
+                    if (!droppingWater.Dead)
+                    {
+                        //check position below
+                        var nextPixelAfterGravity = grid[droppingWater.X, droppingWater.Y + 1];
+
+                        switch (nextPixelAfterGravity)
+                        {
+                            case '#':
+                                FillHorizontal(grid, dropsOfWater, droppingWater, debug);
+                                break;
+                            case '~':
+                                if (!IsStandingWater(grid, dropsOfWater, droppingWater))
+                                {
+                                    droppingWater.Die();
+                                }
+                                else FillHorizontal(grid, dropsOfWater, droppingWater);
+                                break;
+                            case '.':
+                                droppingWater.Y++;
+                                grid[droppingWater.X, droppingWater.Y] = '|';
+                                break;
+                            case '|':
+                                droppingWater.Die();
+                                break;
+                            default:
+                                throw new Exception("Het bestaat niet!");
+                        }
+                    }
+                    if (droppingWater.Y == gameOver) droppingWater.Die();
+
+                }
+
+
+            }
+            Print(grid); //589
+            //Spring lives at x=500,y=0
+            return CountWater(grid);
         }
     }
 }
