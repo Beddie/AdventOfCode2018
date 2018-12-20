@@ -23,6 +23,7 @@ namespace Logic.Days
             Name = "Day 17: Reservoir Research";
         }
 
+
         public override string[] Solution()
         {
             return new string[] {
@@ -90,14 +91,14 @@ namespace Logic.Days
             while (dropsOfWater.Any())
             {
                 tellen++;
-                dropsOfWater.RemoveAll(c=> c.Dead);
+                dropsOfWater.RemoveAll(c => c.Dead);
                 //check current water position (start grid[500, 0])
 
-                //if (tellen > 126)
-                //{
-                //    Print(grid, 450, 550, 180);
-                //    debug = true;
-                //}
+                if (tellen > 887) //126
+                {
+                    Print(grid, 420, 700, 400, 440);
+                    // debug = true;
+                }
                 for (int i = 0; i < dropsOfWater.Count; i++)
                 {
                     var droppingWater = dropsOfWater[i];
@@ -120,6 +121,10 @@ namespace Logic.Days
                             case '.':
                                 droppingWater.Y++;
                                 grid[droppingWater.X, droppingWater.Y] = '|';
+                                break;
+                            case '|':
+                                droppingWater.Die();
+                                //grid[droppingWater.X, droppingWater.Y] = '|';
                                 break;
                             default:
                                 throw new Exception("Het bestaat niet!");
@@ -165,15 +170,28 @@ namespace Logic.Days
             var originalX = droppingWater.X;
             var originalY = droppingWater.Y;
 
+            //Check if standing water is old standing water.
+
             grid[droppingWater.X, droppingWater.Y] = '~';
             while (goHorizontalLeft)
             {
-               
+
                 var nextLeft = grid[droppingWater.X - 1, droppingWater.Y];
                 var nextLeftSurface = grid[droppingWater.X - 1, droppingWater.Y + 1];
-                if ((nextLeft == '.') && nextLeftSurface != '.') {
+                if ((nextLeft == '.') && nextLeftSurface != '.')
+                {
                     grid[droppingWater.X - 1, droppingWater.Y] = '~';
                     droppingWater.X--;
+                }
+                else if ((nextLeft == '|') && nextLeftSurface != '.')
+                {
+                    grid[droppingWater.X - 1, droppingWater.Y] = '~';
+                    droppingWater.X--;
+                    if (dropsOfWater.Any(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y))
+                    {
+                        dropsOfWater.Where(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y).ToList().ForEach(c => c.Die());
+                    }
+
                 }
                 else if (nextLeftSurface == '.')
                 {
@@ -183,7 +201,7 @@ namespace Logic.Days
                     droppingWater.X--;
                     goHorizontalLeft = false;
                 }
-                else if (nextLeft == '#' || nextLeft == '|' ||  nextLeft == '~') goHorizontalLeft = false;
+                else if (nextLeft == '#' || nextLeft == '|' || nextLeft == '~') goHorizontalLeft = false;
 
             }
             var goHorizontalRight = true;
@@ -201,6 +219,15 @@ namespace Logic.Days
                     grid[droppingWater.X + 1, droppingWater.Y] = '~';
                     droppingWater.X++;
                 }
+                else if ((nextRight == '|') && nextRightSurface != '.')
+                {
+                    grid[droppingWater.X + 1, droppingWater.Y] = '~';
+                    droppingWater.X++;
+                    if (dropsOfWater.Any(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y))
+                    {
+                        dropsOfWater.Where(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y).ToList().ForEach(c => c.Die());
+                    }
+                }
                 else if (nextRightSurface == '.')
                 {
                     droppingWater.Die();
@@ -214,7 +241,70 @@ namespace Logic.Days
             droppingWater.X = originalX;
 
             var nextTopStop = grid[droppingWater.X, droppingWater.Y - 1] == '.';
+            if (grid[droppingWater.X, droppingWater.Y - 1] == '~')
+            {
+                droppingWater.Die();
+            }
 
+            if (!nextTopStop) droppingWater.Y = originalY - 1;
+            else
+            {
+                if (!droppingWater.Dead)
+                {
+                    //Find | in line above (width = distance between #....#  TODO) and set coordinates to this line!
+
+                    //Dermine all X values to scan
+                    int? scanLeftX = null;
+                    int? scanRightX = null;
+                    var found = false;
+                    var originalScanX = droppingWater.X;
+                    while (!scanLeftX.HasValue)
+                    {
+
+                        if (grid[droppingWater.X - 1, droppingWater.Y] == '#')
+                        {
+                            //found = true;
+                            scanLeftX = droppingWater.X;
+
+                        }
+                        if (dropsOfWater.Any(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y))
+                        {
+                            dropsOfWater.Where(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y).ToList().ForEach(c => c.Die());
+                        }
+                        droppingWater.X--;
+                    }
+                    droppingWater.X = originalScanX;
+                    while (!scanRightX.HasValue)
+                    {
+                        if (grid[droppingWater.X + 1, droppingWater.Y] == '#')
+                        {
+                            //found = true;
+                            scanRightX = droppingWater.X;
+
+                        }
+                        if (dropsOfWater.Any(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y))
+                        {
+                            dropsOfWater.Where(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y).ToList().ForEach(c => c.Die());
+                        }
+                        droppingWater.X++;
+                    }
+
+                    //Kill other existing drops on the same line?
+
+                    //Find |
+                    for (int scanx = scanLeftX.Value; scanx <= scanRightX; scanx++)
+                    {
+                        if (grid[scanx, droppingWater.Y - 1] == '|')
+                        {
+                            found = true;
+                            droppingWater.X = scanx;
+                            droppingWater.Y--;
+                            break;
+                        }
+                    }
+                }
+            }
+            ;
             //if (nextTopStop) {
             //    //find stream (scan)
             //    var scanLeft = true;
@@ -232,7 +322,7 @@ namespace Logic.Days
             //        else if (grid[droppingWater.X, droppingWater.Y - 1] == '#')
             //        {
             //            scanLeft = false;
-                       
+
             //        }
             //    }
             //    while (scanRight && !found)
@@ -250,24 +340,24 @@ namespace Logic.Days
             //    }
             //}
 
-            droppingWater.Y = originalY - 1;
+
         }
 
-        private void Print(int[,] grid, int firstX = 0, int lastX = 0, int lastY = 0)
+        private void Print(int[,] grid, int firstX = 0, int lastX = 0, int firstY = 0, int lastY = 0)
         {
-                var sb = new StringBuilder();
-                for (int y = 0; y < (lastY == 0 ? grid.GetLength(1): lastY); y++)
+            var sb = new StringBuilder();
+            for (int y = firstY; y < (lastY == 0 ? grid.GetLength(1) : lastY); y++)
+            {
+                for (int x = firstX; x < (lastX == 0 ? grid.GetLength(0) : lastX); x++)
                 {
-                    for (int x = firstX; x < (lastX == 0 ? grid.GetLength(0): lastX); x++)
+                    if (grid[x, y] != 0)
                     {
-                        if (grid[x, y] != 0)
-                        {
-                            sb.Append((char)grid[x, y]);
-                        }
+                        sb.Append((char)grid[x, y]);
                     }
-                    sb.AppendLine();
                 }
-                Debug.WriteLine(sb.ToString());
+                sb.AppendLine();
+            }
+            Debug.WriteLine(sb.ToString());
         }
 
         public override string Part2()
