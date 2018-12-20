@@ -21,7 +21,7 @@ namespace Logic.Days
         public override string[] Solution()
         {
             return new string[] {
-                "30635", ""
+                "30635", "25094"
             };
         }
 
@@ -138,8 +138,7 @@ namespace Logic.Days
 
 
             }
-            Print(grid); //589
-            //Spring lives at x=500,y=0
+            if (Test) Print(grid);
             return CountWater(grid);
         }
 
@@ -195,11 +194,10 @@ namespace Logic.Days
             return standingLeft && standingRight;
         }
 
-        private string CountWater(int[,] grid)
+        private string CountWater(int[,] grid, bool part1 = true)
         {
             var count = 0;
 
-            //Start counting from first Y with #
             //Start counting from first Y with #
             var firstY = (int?)null;
             for (int y = 0; y < grid.GetLength(1); y++)
@@ -222,9 +220,18 @@ namespace Logic.Days
                     var gridVal = grid[x, y];
                     if (gridVal != 0)
                     {
-                        if (gridVal == '~' || gridVal == '|')
+                        if (part1)
                         {
-                            count++;
+                            if (gridVal == '~' || gridVal == '|')
+                            {
+                                count++;
+                            }
+                        }
+                        else {
+                            if (gridVal == '~')
+                            {
+                                count++;
+                            }
                         }
                     }
                 }
@@ -237,7 +244,7 @@ namespace Logic.Days
             var goHorizontalLeft = true;
             var originalX = droppingWater.X;
             var originalY = droppingWater.Y;
-
+            var unrest = false;
             //Check if standing water is old standing water.
             grid[droppingWater.X, droppingWater.Y] = '~';
             while (goHorizontalLeft)
@@ -260,7 +267,40 @@ namespace Logic.Days
                 }
                 else if (nextLeftSurface == '.')
                 {
-                    droppingWater.Die();
+                    //Part2 ~ to | from here to right till .
+                    var unrestfullWater = true;
+                    var orgin = droppingWater.X;
+                    unrest = true;
+                    while (unrestfullWater)
+                    {
+                        var nextunRestFullCheck = grid[droppingWater.X + 1, droppingWater.Y];
+                        var nextunRestFullSurfaceCheck = grid[droppingWater.X + 1, droppingWater.Y +1];
+                        if (nextunRestFullCheck == '#')
+                        {
+                            grid[droppingWater.X, droppingWater.Y] = '|';
+                            unrestfullWater = false;
+                        }
+                        else if ((nextunRestFullSurfaceCheck == '~' && nextunRestFullCheck == '.') || (nextunRestFullSurfaceCheck == '~' && nextunRestFullCheck == '|'))
+                        {
+                            grid[droppingWater.X, droppingWater.Y] = '|';
+                            droppingWater.X++;
+                        }
+                        else if (nextunRestFullSurfaceCheck == '.')
+                        {
+                            grid[droppingWater.X, droppingWater.Y] = '|';
+                            droppingWater.X++;
+                            grid[droppingWater.X, droppingWater.Y] = '|';
+                            dropsOfWater.Add(new Pixel(droppingWater.X, droppingWater.Y));
+                            unrestfullWater = false;
+                        }
+                        else {
+                            grid[droppingWater.X, droppingWater.Y] = '|';
+                            droppingWater.X++;
+                        }
+                    }
+                    droppingWater.X = orgin;
+
+                        droppingWater.Die();
                     dropsOfWater.Add(new Pixel(droppingWater.X - 1, droppingWater.Y));
                     grid[droppingWater.X - 1, droppingWater.Y] = '|';
                     droppingWater.X--;
@@ -281,7 +321,7 @@ namespace Logic.Days
                     grid[droppingWater.X + 1, droppingWater.Y] = '~';
                     droppingWater.X++;
                 }
-                else if ((nextRight == '|') && nextRightSurface != '.')
+                else if ((nextRight == '|') && nextRightSurface != '.' && !unrest)
                 {
                     droppingWater.X++;
                     if (!dropsOfWater.Any(c => c != droppingWater && c.X == droppingWater.X && c.Y == droppingWater.Y))
@@ -289,8 +329,43 @@ namespace Logic.Days
                         grid[droppingWater.X, droppingWater.Y] = '~';
                     }
                 }
-                else if (nextRightSurface == '.')
+                else if ((nextRightSurface == '.') || ((nextRight == '|') && nextRightSurface != '.' && !unrest))
                 {
+                    var unrestfullWater = true;
+                    var orgin = droppingWater.X;
+                    while (unrestfullWater)
+                    {
+                        var nextunRestFullCheck = grid[droppingWater.X - 1, droppingWater.Y];
+                        var nextunRestFullSurfaceCheck = grid[droppingWater.X - 1, droppingWater.Y + 1];
+                        //var nextRightSurface = grid[droppingWater.X + 1, droppingWater.Y + 1];
+                        if (nextunRestFullCheck == '#')
+                        {
+                            grid[droppingWater.X, droppingWater.Y] = '|';
+                            unrestfullWater = false;
+
+                        }
+                        else if ((nextunRestFullSurfaceCheck == '~' && nextunRestFullCheck == '.') || (nextunRestFullSurfaceCheck == '~' && nextunRestFullCheck == '|'))
+                        {
+                            grid[droppingWater.X, droppingWater.Y] = '|';
+                            droppingWater.X--;
+                        }
+                        else if (nextunRestFullSurfaceCheck == '.')
+                        {
+                            grid[droppingWater.X, droppingWater.Y] = '|';
+                            droppingWater.X--;
+                            grid[droppingWater.X, droppingWater.Y] = '|';
+                            dropsOfWater.Add(new Pixel(droppingWater.X, droppingWater.Y));
+                            unrestfullWater = false;
+                        }
+                        else
+                        {
+                            grid[droppingWater.X, droppingWater.Y] = '|';
+                            droppingWater.X--;
+                        }
+                    }
+                    droppingWater.X = orgin;
+
+
                     droppingWater.Die();
                     dropsOfWater.Add(new Pixel(droppingWater.X + 1, droppingWater.Y));
                     grid[droppingWater.X + 1, droppingWater.Y] = '|';
@@ -470,15 +545,10 @@ namespace Logic.Days
                         }
                     }
                     if (droppingWater.Y == gameOver) droppingWater.Die();
-
                 }
-
-
             }
-            Print(grid); //589
-            //Spring lives at x=500,y=0
-            return CountWater(grid);
+            if (Test) Print(grid);
+            return CountWater(grid, false);
         }
     }
 }
-
