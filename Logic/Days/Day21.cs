@@ -19,7 +19,7 @@ namespace Logic.Days
             // Test = true;
             PuzzleInput = Test ? Resources.Day21Example : Resources.Day21;
             ID = 21;
-            Name = "Day 21:";
+            Name = "Day 21: Chronal Conversion";
         }
 
         public override string[] Solution()

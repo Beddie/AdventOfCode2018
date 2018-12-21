@@ -570,27 +570,6 @@ namespace Logic.Properties
                 return ResourceManager.GetString("Day25Example", resourceCulture);
             }
         }
-
-
-
-
-        internal static string Day26
-        {
-            get
-            {
-                return ResourceManager.GetString("Day26", resourceCulture);
-            }
-        }
-
-        internal static string Day26Example
-        {
-            get
-            {
-                return ResourceManager.GetString("Day26Example", resourceCulture);
-            }
-        }
-
-
     }
 
 }
