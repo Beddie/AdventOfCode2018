@@ -1,14 +1,7 @@
-﻿using Logic.Interface;
-using Logic.Properties;
+﻿using Logic.Properties;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Logic.Days
 {
@@ -30,7 +23,38 @@ namespace Logic.Days
 
         public override string Part1()
         {
+            //var puzzleRegex = "^ENWWW(NEEE|SSE(EE|N))$";
+            //var bb = puzzleRegex.Split(new[] { "(", ")" },StringSplitOptions.None).Select(s => s.Split('|'));
+
+            //var startNode = new HierachyPuzzle("");
+            //var sb = new StringBuilder();
+
+            //foreach (var character in puzzleRegex)
+            //{
+            //    if (character == '(') {
+            //        var child = new HierachyPuzzle();
+            //        startNode.Child = child;
+            //        if (character == '|')
+            //        {
+            //            var childchild = new HierachyPuzzle();
+
+            //        }
+            //    else { sb.Append(character); }
+                
+                
+            //}
+
+
             return "";
+        }
+
+        public class HierachyPuzzle
+        {
+            public HierachyPuzzle(string input) {
+                Puzzle = input;
+            }
+            public string Puzzle { get; set; }
+            public HierachyPuzzle Child { get; set; }
         }
 
         public override string Part2()

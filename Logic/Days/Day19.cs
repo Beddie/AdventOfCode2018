@@ -62,10 +62,10 @@ namespace Logic.Days
         #region Logic
         private List<Opcode> opcodes = new List<Opcode>();
 
-        private void Print(Sample sample, int pointer)
+        private void Print(int i, Sample sample, int pointer)
         {
             var sb = new StringBuilder();
-            sb.Append($"ip={pointer} [{string.Join(", ", sample.Before.Registers)}] {sample.Instruction.Opcode.Method.Name} {sample.Instruction.InputA} {sample.Instruction.InputB}  {sample.Instruction.OutputC} [{string.Join(", ", sample.After.Registers)}]");
+            sb.Append($"sample {i}, pointerRegister2= {pointer} [{string.Join(", ", sample.Before.Registers)}] {sample.Instruction.Opcode.Method.Name} {sample.Instruction.InputA} {sample.Instruction.InputB} {sample.Instruction.OutputC} [{string.Join(", ", sample.After.Registers)}]");
             Debug.WriteLine(sb.ToString());
         }
 
@@ -142,10 +142,8 @@ namespace Logic.Days
             var B = sample.Instruction.InputB;
             var C = sample.Instruction.OutputC;
             check[C] = check[A] + check[B];
+
             sample.After.Registers = check;
-
-            // return (check.SequenceEqual(sample.After.registers));
-
         }
 
         //addi(add immediate) stores into register C the result of adding register A and value B.
@@ -332,8 +330,9 @@ namespace Logic.Days
         #region Part2
         public override string Part2()
         {
-            //long reg0 = InvestigatePattern(new Register(1, 0, 0, 0, 0, 0), (long)0);
-            long reg0 = InvestigatePattern(new Register(0, 0, 10, 10551374, 1, 14007), (long)10);
+             //long reg0 = InvestigatePattern(new Register(1, 0, 0, 0, 0, 0), (long)0);
+            //long reg0 = InvestigatePattern(new Register(0, 0, 10, 10551374, 1, 14007), (long)10);
+            long reg0 = InvestigatePattern(new Register(1, 3, 14, 10551374, 2, 10551375), (long)14);
             return reg0.ToString();
         }
 
@@ -363,11 +362,15 @@ namespace Logic.Days
                 difference = register.Registers[boundRegister] - instructionPointer;
                 instructionPointer = register.Registers[boundRegister];
 
-
-                if ((int)instructionPointer > 10) Print(samples[i], (int)instructionPointer);
-                if (startPrint) Print(samples[i], (int)instructionPointer);
-                reg0 = register.Registers[0];
-                //if (reg0 > 0) Print(samples[i], instructionPointer);
+                Print(i, samples[i], (int)instructionPointer);
+                // if ((int)instructionPointer > 10) Print(samples[i], (int)instructionPointer);
+                //if (startPrint) Print(i, samples[i], (int)instructionPointer);
+                //reg0 = register.Registers[0];
+                //if (instructionPointer == 14)
+                //{
+                //    Print(i, samples[i], (int)instructionPointer);
+                //    startPrint = true;
+                //}
                 //if (instructionPointer == 33)
                 //{
                 //    startPrint = true;
@@ -376,7 +379,9 @@ namespace Logic.Days
 
                 instructionPointer++;
 
-                if (instructionPointer >= samples.Count()) { break; }
+                if (instructionPointer >= samples.Count()) {
+                    reg0 = samples[i].After.Registers[0];
+                    break; }
                 i = i + (int)difference;
             }
 
