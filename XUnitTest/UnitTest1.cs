@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Xunit;
 
 namespace XUnitTest
@@ -19,13 +20,18 @@ namespace XUnitTest
             {
                 var sw = new Stopwatch();
                 sw.Start();
-                var day = RenderDay.GetDay(22);
-                var check = day.Part2();
+                var day = RenderDay.GetDay(20);
+                var check = day.Part1();
                // if (check != day.Solution()[0]) throw new Exception("Niet get goede antwoord!");
                 sw.Stop();
                 averageRunTime.Add(sw.ElapsedMilliseconds);
             }
             Debug.WriteLine($"Average complete in {averageRunTime.Average()} ms");
+        }
+
+        public void TestNew() {
+            var bb = new Regex(@"(?=\()(?=((?:(?=.*?\((?!.*?\2)(.*\)(?!.*\3).*))(?=.*?\)(?!.*?\3)(.*)).)+?.*?(?=\2)[^(]*(?=\3$)))");
+            var cc = bb.GetGroupNames(); // ("(=hi (how (are (you)test)))");
         }
     }
 }
