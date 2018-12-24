@@ -17,7 +17,7 @@ namespace Logic.Days
     {
         public Day24()
         {
-           // Test = true;
+            Test = true;
             PuzzleInput = Test ? Resources.Day24Example : Resources.Day24;
             ID = 24;
             Name = "Day 24: Immune System Simulator 20XX";
@@ -32,7 +32,8 @@ namespace Logic.Days
 
         private class Game
         {
-            public Game(int attackPowerBoost, List<UnitGroup> unitGroups) {
+            public Game(int attackPowerBoost, List<UnitGroup> unitGroups)
+            {
                 AttackpowerBoost = attackPowerBoost;
 
                 unitGroups.Where(c => c.UnitType == UnitType.Immune_System).ToList().ForEach(c => c.Attackpower += attackPowerBoost);
@@ -52,6 +53,14 @@ namespace Logic.Days
             internal string Part1()
             {
                 return UnitGroups.Sum(c => c.AmountUnits).ToString();
+            }
+            internal string ImmuneUnitsAmount()
+            {
+                return UnitGroups.Where(c => c.UnitType == UnitType.Immune_System).Sum(c => c.AmountUnits).ToString();
+            }
+            internal string InfectionUnitAmount()
+            {
+                return UnitGroups.Where(c => c.UnitType == UnitType.Infection).Sum(c => c.AmountUnits).ToString();
             }
         }
 
@@ -88,19 +97,26 @@ namespace Logic.Days
             {
                 game.UnitGroups.ForEach((c) => { c.UnitToAttack = null; c.UnitToDefend = null; });
                 //Choosing Phase
-                foreach (var unitGroup in game.UnitGroups.OrderByDescending(c => c.EffectivePower).ThenByDescending(c => c.Initiative))
+
+                var unitList = game.UnitGroups.OrderByDescending(c => c.EffectivePower).ThenByDescending(c => c.Initiative).ToList();
+                for (int i = 0; i < unitList.Count; i++)
                 {
-                    unitGroup.ChooseTarget(game.UnitGroups);
+                    if (!unitList[i].GameOver)
+                    {
+                        unitList[i].ChooseTarget(game.UnitGroups);
+                    }
                 }
 
-                //AttackPhase
-                foreach (var unitGroup in game.UnitGroups.OrderByDescending(c => c.Initiative)) //OrderByDescending(c => c.EffectivePower)
+                var attackUnitList = unitList.OrderByDescending(c => c.Initiative).ToList();
+                for (int i = 0; i < attackUnitList.Count; i++)
                 {
-                    unitGroup.Attack();
-
+                    if (!attackUnitList[i].GameOver)
+                    {
+                        attackUnitList[i].Attack();
+                    }
                 }
                 game.UnitGroups.RemoveAll(c => c.GameOver);
-                Print(game.UnitGroups);
+                //Print(game.UnitGroups);
             }
             return game.Part1();
         }
@@ -109,12 +125,11 @@ namespace Logic.Days
         public override string Part2()
         {
 
-            var attackPowerBoost = 0;
+            var attackPowerBoost = 0; //23950
             var amountHp = "";
             while (string.IsNullOrEmpty(amountHp))
             {
-               
-               
+                var hpInfection = "";
                 var digitRegex = new Regex(@"-?\d+");
 
                 var puzzleLines = PuzzleInput.Split(new[] { "\r\n" }, StringSplitOptions.None);
@@ -140,33 +155,45 @@ namespace Logic.Days
 
                 var game = new Game(attackPowerBoost, unitGroups);
 
+
                 while (!game.GameOver)
                 {
-
+                    var killedAny = false;
                     game.UnitGroups.ForEach((c) => { c.UnitToAttack = null; c.UnitToDefend = null; });
                     //Choosing Phase
-                    foreach (var unitGroup in game.UnitGroups.OrderByDescending(c => c.EffectivePower).ThenByDescending(c => c.Initiative))
+
+                    var unitList = game.UnitGroups.OrderByDescending(c => c.EffectivePower).ThenByDescending(c => c.Initiative).ToList();
+                    for (int i = 0; i < unitList.Count; i++)
                     {
-                        unitGroup.ChooseTarget(game.UnitGroups);
+                        if (!unitList[i].GameOver)
+                        {
+                            unitList[i].ChooseTarget(game.UnitGroups);
+                        }
                     }
 
-                    //AttackPhase
-                    foreach (var unitGroup in game.UnitGroups.OrderByDescending(c => c.Initiative)) //OrderByDescending(c => c.EffectivePower)
+                    var attackUnitList = unitList.OrderByDescending(c => c.Initiative).ToList();
+                    for (int i = 0; i < attackUnitList.Count; i++)
                     {
-                        unitGroup.Attack();
-
+                        if (!attackUnitList[i].GameOver)
+                        {
+                            if (attackUnitList[i].Attack()) killedAny = true;
+                        }
                     }
                     game.UnitGroups.RemoveAll(c => c.GameOver);
+                    if (!killedAny) break;
                     //Print(game.UnitGroups);
                 }
-
-                if (game.GameOverPart2) {
+             
+                if (game.GameOverPart2)
+                {
                     amountHp = game.Part1();
                 }
-                var bb = game.Part1();
-                attackPowerBoost++;
+
+                Debug.WriteLine($"Roundover, Boost: {attackPowerBoost}, HpInfectionAmount: {game.InfectionUnitAmount()}, HpImmuneAmount: {game.ImmuneUnitsAmount()}, Stopped: {hpInfection == game.InfectionUnitAmount()}");
+                attackPowerBoost += 1;
+                //var bb = game.Part1();
             }
-            return amountHp;
+            return amountHp; //24237 TO HIGH
         }
 
         private enum AttackType
@@ -188,7 +215,7 @@ namespace Logic.Days
         private class UnitGroup
         {
             public int Attackpower { get; set; }
-            
+
             public int Initiative { get; set; }
             public AttackType AttackType { get; set; }
             public UnitType UnitType { get; set; }
@@ -201,7 +228,7 @@ namespace Logic.Days
             public bool GameOver => !Units.Any();
 
 
-            public int EffectivePower => AmountUnits * (Attackpower);
+            public int EffectivePower => AmountUnits * Attackpower;
 
             public UnitGroup UnitToAttack { get; set; }
             public UnitGroup UnitToDefend { get; set; }
@@ -302,7 +329,7 @@ namespace Logic.Days
             {
                 var damageDone = 0;
                 List<UnitGroup> unitsToChooseFrom = new List<UnitGroup>();
-                foreach (var unit in unitGroupList.Where(c => c.UnitType == EnemyUnitType && c.UnitToDefend == null))
+                foreach (var unit in unitGroupList.Where(c => c.UnitType == EnemyUnitType && c.UnitToDefend == null)) //&& !c.ImmuneTo.Contains(AttackType)
                 {
                     var unitDamage = CalculateAttackpower(unit);
                     if (unitDamage > damageDone)
@@ -315,7 +342,6 @@ namespace Logic.Days
                     {
                         unitsToChooseFrom.Add(unit);
                     }
-
                 }
 
                 //choose 1 target
@@ -325,7 +351,7 @@ namespace Logic.Days
                 if (unitsToChooseFrom.Any())
                 {
                     UnitToAttack = unitsToChooseFrom.First();
-                    unitsToChooseFrom.First().UnitToDefend = UnitToAttack;
+                    UnitToAttack.UnitToDefend = UnitToAttack;
                 }
             }
 
@@ -344,27 +370,36 @@ namespace Logic.Days
                 return testAttackpower * Units.Count();
             }
 
-            internal void Attack()
+            internal bool Attack()
             {
                 if (UnitToAttack != null)
                 {
+                    if (UnitToAttack.GameOver) return false;
+
                     var hitPower = CalculateAttackpower(UnitToAttack);
-                    UnitToAttack.TakeHit(hitPower);
+                    return UnitToAttack.TakeHit(hitPower);
                 }
+                return false;
             }
 
-            private void TakeHit(int hitPower)
+            private bool TakeHit(int hitPower)
             {
                 var amountHit = hitPower;
-                foreach (var unit in Units.OrderBy(c => c.HP))
-                {
+                var killUNits = hitPower / Units.First().HP;
+                if (killUNits == 0) return false;
+                //foreach (var unit in Units.OrderBy(c => c.HP))
+                //{
+                //    amountHit -= unit.Hit(amountHit);
+                //}
 
-                    amountHit -= unit.Hit(amountHit);
+                //var killed = Units.Any(c => c.Dead);
+                if (killUNits > Units.Count) killUNits = Units.Count;
+                Units.RemoveRange(0, killUNits);
+                //Units.RemoveAll(c => c.Dead);
 
-                }
+               
 
-                Units.RemoveAll(c => c.Dead);
-
+                return true;
                 //if (amountHit == 0) break;
             }
         }
