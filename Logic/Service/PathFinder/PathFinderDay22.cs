@@ -205,11 +205,11 @@ namespace Logic.Service.Pathfinder
             switch (toNodeCave)
             {
                 case '.':
-                    return new List<CaveTool> { CaveTool.ClimbingGear, CaveTool.Torch };
+                    return new List<CaveTool> {  CaveTool.Torch, CaveTool.ClimbingGear };
                 case '=':
-                    return new List<CaveTool> { CaveTool.None, CaveTool.ClimbingGear };
+                    return new List<CaveTool> { CaveTool.ClimbingGear , CaveTool.None};
                 case '|':
-                    return new List<CaveTool> { CaveTool.None , CaveTool.Torch, };
+                    return new List<CaveTool> { CaveTool.Torch,CaveTool.None };
                 default:
                     return null;
             }
