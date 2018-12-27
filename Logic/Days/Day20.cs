@@ -12,7 +12,7 @@ namespace Logic.Days
     {
         public Day20()
         {
-            // Test = true;
+             Test = true;
             PuzzleInput = Test ? Resources.Day20Example : Resources.Day20;
             ID = 20;
             Name = "Day 20: A Regular Map";
