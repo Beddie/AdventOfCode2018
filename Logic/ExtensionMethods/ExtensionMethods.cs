@@ -26,5 +26,122 @@ namespace Logic.ExtensionMethods
         {
             Debug.WriteLine(JsonConvert.SerializeObject(obj));
         }
+
+
+        public static string GetStringTillClosing(this string str, char start = '(', char end = ')')
+        {
+            int s = 0;
+            int i = -1;
+            int newNest = 0;
+            //while (++i < str.Length)
+            //    if (str[i] == start)
+            //    {
+            //        s = i;
+            //        break;
+            //    }
+            int e = 0;
+            while (++i < str.Length)
+            {
+                if (str[i] == start)
+                {
+                    newNest++;
+                }
+                else if (str[i] == end)
+                {
+
+                    if (newNest == 0)
+                    {
+                        e = i;
+                        break;
+                    }
+                    newNest--;
+                }
+            }
+            if (e > s)
+                return str.Substring(s, e - s);
+            //return str.Substring(s + 1 , e - s - 1);
+            return string.Empty;
+        }
+
+
+        //public static string GetFirstBranch(this string str, char start = '(', char end = ')')
+        //{
+        //    int s = -1;
+        //    int i = -1;
+        //    int newNest = 0;
+        //    while (++i < str.Length)
+        //        if (str[i] == start)
+        //        {
+        //            s = i;
+        //            break;
+        //        }
+        //    int e = -1;
+        //    while (++i < str.Length)
+        //    {
+        //        if (str[i] == start)
+        //        {
+        //            newNest++;
+        //        }
+        //        else if (str[i] == end)
+        //        {
+
+        //            if (newNest == 0)
+        //            {
+        //                e = i;
+        //                break;
+        //            }
+        //            newNest--;
+        //        }
+        //    }
+        //    if (e > s)
+        //        return str.Substring(s , e - s + 1);
+        //    //return str.Substring(s + 1 , e - s - 1);
+        //    return string.Empty;
+        //}
+
+        public static List<string> GetOptions(this string str, char optionChar = '|')
+        {
+            var start = '(';
+            var end = ')';
+            int i = -1;
+            int insideParenthesis = 0;
+            var optionIndexes = new List<int>();
+            var options = new List<string>();
+
+            while (++i < str.Length)
+            {
+                if (str[i] == start)
+                {
+                    insideParenthesis++;
+                }
+                else if (str[i] == end)
+                {
+                    insideParenthesis--;
+                }
+                else if (str[i] == optionChar && insideParenthesis == 0)
+                {
+                    optionIndexes.Add(i);
+                }
+            }
+            if (optionIndexes.Any())
+            {
+                var index = 0;
+                // optionIndexes.Add(0);
+                foreach (var option in optionIndexes.OrderBy(c => c))
+                {
+                    var isPipe = str[index] == '|' ? 1 : 0;
+                    options.Add(str.Substring(index + isPipe, option - (index + isPipe))); //.Replace("|", ""));
+                    index = option;
+                }
+                //add lastoption
+                var isPipee = str[index] == '|' ? 1 : 0;
+                options.Add(str.Substring(index + isPipee, str.Length - (index + isPipee))); //.Replace("|", ""));
+                //options.Add(str.Substring(index, str.Length - index)); //.Replace("|", ""));
+                //index = option;
+            }
+            //return str.Substring(s + 1 , e - s - 1);
+            return options;
+        }
+
     }
 }

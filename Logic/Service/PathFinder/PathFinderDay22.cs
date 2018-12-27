@@ -42,7 +42,6 @@ namespace Logic.Service.Pathfinder
         private bool mPunishChangeDirection = false;
         private bool mReopenCloseNodes = true;
         private bool mTieBreaker = true;
-        private bool mHeavyDiagonals = false;
         private int mSearchLimit = 90000;
         #endregion
 
@@ -99,19 +98,11 @@ namespace Logic.Service.Pathfinder
                     break;
                 }
 
-                if (mClose.Count > mSearchLimit)
-                {
-                    mStopped = true;
-                    return null;
-                }
-
                 for (int i = 0; i < 4; i++)
                 {
                     PathFinderNodeDay22 newInitialNode;
                     newInitialNode.X = parentNode.X + direction[i, 0];
                     newInitialNode.Y = parentNode.Y + direction[i, 1];
-                    //newInitialNode.CaveTool = parentNode.CaveTool;
-
 
                     if (newInitialNode.X < 0 || newInitialNode.Y < 0 || newInitialNode.X >= gridX || newInitialNode.Y >= gridY)
                         continue;
@@ -119,10 +110,8 @@ namespace Logic.Service.Pathfinder
                     int newG;
 
                     //TOOL
-                    //var fromNodeCave = mCaveGrid[parentNode.X, parentNode.Y];
                     var toNodeCave = mCaveGrid[newInitialNode.X, newInitialNode.Y];
                     var optionalCaveTools = GetToolOptions(toNodeCave);
-                    //if (newNodeCave = )
 
                     foreach (var toolPath in optionalCaveTools)
                     {
@@ -141,7 +130,7 @@ namespace Logic.Service.Pathfinder
                         int foundInOpenIndex = -1;
                         for (int j = 0; j < mOpen.Count; j++)
                         {
-                            if (mOpen[j].X == newNode.X && mOpen[j].Y == newNode.Y)
+                            if (mOpen[j].X == newNode.X && mOpen[j].Y == newNode.Y && mOpen[j].CaveTool == newNode.CaveTool)
                             {
                                 foundInOpenIndex = j;
                                 break;
@@ -152,7 +141,7 @@ namespace Logic.Service.Pathfinder
                         int foundInCloseIndex = -1;
                         for (int j = 0; j < mClose.Count; j++)
                         {
-                            if (mClose[j].X == newNode.X && mClose[j].Y == newNode.Y)
+                            if (mClose[j].X == newNode.X && mClose[j].Y == newNode.Y && mClose[j].CaveTool == newNode.CaveTool)
                             {
                                 foundInCloseIndex = j;
                                 break;
@@ -166,18 +155,6 @@ namespace Logic.Service.Pathfinder
                         newNode.G = newG;
                         newNode.H = mHEstimate * (Math.Abs(newNode.X - end.X) + Math.Abs(newNode.Y - end.Y));
 
-
-                        if (mTieBreaker)
-                        {
-                            int dx1 = parentNode.X - end.X;
-                            int dy1 = parentNode.Y - end.Y;
-                            int dx2 = start.X - end.X;
-                            int dy2 = start.Y - end.Y;
-                            int cross = Math.Abs(dx1 * dy2 - dx2 * dy1);
-                            newNode.H = (int)(newNode.H + cross * 0.001);
-                        }
-
-
                         newNode.F = newNode.G + newNode.H;
                         mOpen.Push(newNode);
                     }
@@ -189,7 +166,7 @@ namespace Logic.Service.Pathfinder
                 PathFinderNodeDay22 fNode = mClose[mClose.Count - 1];
                 for (int i = mClose.Count - 1; i >= 0; i--)
                 {
-                    if (fNode.PX == mClose[i].X && fNode.PY == mClose[i].Y || i == mClose.Count - 1) fNode = mClose[i];
+                    if (fNode.PX == mClose[i].X && fNode.PY == mClose[i].Y && fNode.ParentCaveTool == mClose[i].CaveTool || i == mClose.Count - 1) fNode = mClose[i];
                     else mClose.RemoveAt(i);
                 }
                 mStopped = true;

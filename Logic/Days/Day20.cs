@@ -1,4 +1,5 @@
-﻿using Logic.Properties;
+﻿using Logic.ExtensionMethods;
+using Logic.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,91 +25,78 @@ namespace Logic.Days
 
         public override string Part1()
         {
-            var puzzleRegex = "^ENWWW(NEEE|SSE)$"; //^ENWWW(NEEE|SSE(EE|N))$
-            //var bb = puzzleRegex.Split(new[] { "(", ")" }, StringSplitOptions.None).Select(s => s.Split('|'));
-
-            var parentNode = new HierachyPuzzle("");
-            var childNode = new HierachyPuzzle("");
+            var puzzleRegex = "^WSSEESWWWNW(S|NENNEEEENN(ESSSSW(NWSW|SSEN)|WSWWN(E|WWS(E|SS))))$";
+            var parentNode = new PuzzleRoute("");
             var sb = new StringBuilder();
 
-            for (int i = 0; i < puzzleRegex.Length; i++)
-            {
-                var character = puzzleRegex[i];
-                switch (character)
-                {
-                    //create childnode and save parentnode
-                    case '(':
-                        parentNode.Puzzle = sb.ToString();
-                        childNode = new HierachyPuzzle();
-                        //parentNode.Children.Add(childNode);
+            var puzzleRoute = CreateChilds(puzzleRegex.Replace("^", "").Replace("$", ""));
 
-                        sb.Clear();
-                        break;
-                    //add childnode
-                    case ')':
-                        childNode.Puzzle = sb.ToString();
-                        //childNode = new HierachyPuzzle();
-                        sb.Clear();
-                        break;
-                    //create another childnode
-                    case '|':
-                        parentNode.Children.Add(childNode);
-                        childNode = new HierachyPuzzle();
-                        sb.Clear();
-                        break;
-                    default:
-                        sb.Append(character);
-                        break;
-                }
-            }
-            foreach (var character in puzzleRegex)
-            {
-                switch (character)
-                {
-                    //create childnode and save parentnode
-                    case '(':
-                        parentNode.Puzzle = sb.ToString();
-                        childNode = new HierachyPuzzle();
-                        //parentNode.Children.Add(childNode);
-
-                        sb.Clear();
-                        break;
-                    //add childnode
-                    case ')':
-                        childNode.Puzzle = sb.ToString();
-                        //childNode = new HierachyPuzzle();
-                        sb.Clear();
-                        break;
-                    //create another childnode
-                    case '|':
-                        parentNode.Children.Add(childNode);
-                        childNode = new HierachyPuzzle();
-                        sb.Clear();
-                        break;
-                    default:
-                        sb.Append(character);
-                        break;
-                }
-            }
             return "";
         }
 
-        private void AddNode(HierachyPuzzle parent) {
+        public PuzzleRoute GetChildBranch(string str)
+        {
+            PuzzleRoute mainRoutes = new PuzzleRoute();
+            var options = str.GetOptions();
+            if (!options.Any()) { options = new List<string> { str }; };
 
-
+            var createNewPuzzleRoute = false;
+          
+            for (int i = 0; i < options.Count; i++)
+            {
+                PuzzleRoute optionalRoute = new PuzzleRoute();
+                mainRoutes.Options.Add(optionalRoute);
+                var opt = options[i];
+                while (opt.Length > 0)
+                {
+                    var character = opt.First();
+                    opt = opt.Remove(0, 1);
+                    if (character == '(')
+                    {
+                        var getTotalBranch = opt.GetStringTillClosing();
+                        var childBranch = GetChildBranch(getTotalBranch);
+                        optionalRoute.Branches.Add(childBranch);
+                        opt = opt.Remove(0, getTotalBranch.Length);
+                    }
+                    else if (character == ')')
+                    {
+                        createNewPuzzleRoute = true;
+                    }
+                    else
+                    {
+                        if (createNewPuzzleRoute)
+                        {
+                            optionalRoute = new PuzzleRoute();
+                            mainRoutes.Options.Add(optionalRoute);
+                            createNewPuzzleRoute = false;
+                        }
+                        optionalRoute.Puzzle.Append(character);
+                    }
+                }
+            }
+            return mainRoutes;
         }
 
-        public class HierachyPuzzle
+       
+        private PuzzleRoute CreateChilds(string stream)
         {
-            public HierachyPuzzle(string input)
+            //Get everything from first ( to  last closing )
+            var subChilds = GetChildBranch(stream);
+            return subChilds;
+        }
+
+        public class PuzzleRoute
+        {
+            public PuzzleRoute(string input)
             {
-                Puzzle = input;
+                Puzzle = new StringBuilder(input);
             }
-            public HierachyPuzzle()
+            public PuzzleRoute()
             {
             }
-            public string Puzzle { get; set; }
-            public List<HierachyPuzzle> Children { get; set; } = new List<HierachyPuzzle>();
+            public StringBuilder Puzzle { get; set; } = new StringBuilder();
+            public List<PuzzleRoute> Branches { get; set; } = new List<PuzzleRoute>();
+            public List<PuzzleRoute> Options { get; set; } = new List<PuzzleRoute>();
         }
 
         public override string Part2()

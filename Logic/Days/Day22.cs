@@ -120,28 +120,8 @@ namespace Logic.Days
             }
         }
 
-        //private int GetErosionLevel(long geologicalIndex, int depth)
-        //{
-        //    var erosionlevel = (geologicalIndex + depth) % 20183;
-        //    switch (erosionlevel % 3)
-        //    {
-        //        case 0:
-        //            return '.';
-        //        case 1:
-        //            return '=';
-        //        case 2:
-        //            return '|';
-        //        default:
-        //            return 0;
-        //    }
-        //}
-
         private long GetGeologicIndex(long[,] geologicGrid, int x, int y, long[,] erosionGrid, int targetX, int targetY)
         {
-            //if (x > 0 && y > 0)
-            //{
-
-            //}
             if (x == 0 && y == 0)
             {
                 return 0;
@@ -196,6 +176,22 @@ namespace Logic.Days
 
         public override string Part2()
         {
+
+            //int[,] graph =  {
+            //             { 0, 6, 0, 0, 0, 0, 0, 9, 0 },
+            //             { 6, 0, 9, 0, 0, 0, 0, 11, 0 },
+            //             { 0, 9, 0, 5, 0, 6, 0, 0, 2 },
+            //             { 0, 0, 5, 0, 9, 16, 0, 0, 0 },
+            //             { 0, 0, 0, 9, 0, 10, 0, 0, 0 },
+            //             { 0, 0, 6, 0, 10, 0, 2, 0, 0 },
+            //             { 0, 0, 0, 16, 0, 2, 0, 1, 6 },
+            //             { 9, 11, 0, 0, 0, 0, 1, 0, 5 },
+            //             { 0, 0, 2, 0, 0, 0, 6, 5, 0 }
+            //                };
+
+            //DijkstraAlgo(graph, 0, 9);
+
+
             var puzzle = (Test) ? new int[] { 510, 10, 10 } : new int[] { 11820, 7, 782 };
             var depth = puzzle[0];
             var targetX = puzzle[1];
@@ -253,12 +249,64 @@ namespace Logic.Days
             }
 
             var fastestRoute = new PathFinderDay22(pathFinderGrid, finalGrid);
-            var path = fastestRoute.FindPath(new System.Drawing.Point(0, 0), new System.Drawing.Point(targetX, targetY));//new System.Drawing.Point(targetX, targetY)
+            var path = fastestRoute.FindPath(new System.Drawing.Point(0, 0), new System.Drawing.Point(targetX, targetY));
 
             var totalCost = AddPathToGridAndCountSwitches(path,finalGrid) * 7 + path.Count -1 ;
             Print(finalGrid);
             return "";
         }
+
+        private static int MinimumDistance(int[] distance, bool[] shortestPathTreeSet, int verticesCount)
+        {
+            int min = int.MaxValue;
+            int minIndex = 0;
+
+            for (int v = 0; v < verticesCount; ++v)
+            {
+                if (shortestPathTreeSet[v] == false && distance[v] <= min)
+                {
+                    min = distance[v];
+                    minIndex = v;
+                }
+            }
+
+            return minIndex;
+        }
+
+        private static void Print(int[] distance, int verticesCount)
+        {
+            Debug.WriteLine("Vertex    Distance from source");
+
+            for (int i = 0; i < verticesCount; ++i)
+                Debug.WriteLine("{0}\t  {1}", i, distance[i]);
+        }
+
+        public static void DijkstraAlgo(int[,] graph, int source, int verticesCount)
+        {
+            int[] distance = new int[verticesCount];
+            bool[] shortestPathTreeSet = new bool[verticesCount];
+
+            for (int i = 0; i < verticesCount; ++i)
+            {
+                distance[i] = int.MaxValue;
+                shortestPathTreeSet[i] = false;
+            }
+
+            distance[source] = 0;
+
+            for (int count = 0; count < verticesCount - 1; ++count)
+            {
+                int u = MinimumDistance(distance, shortestPathTreeSet, verticesCount);
+                shortestPathTreeSet[u] = true;
+
+                for (int v = 0; v < verticesCount; ++v)
+                    if (!shortestPathTreeSet[v] && Convert.ToBoolean(graph[u, v]) && distance[u] != int.MaxValue && distance[u] + graph[u, v] < distance[v])
+                        distance[v] = distance[u] + graph[u, v];
+            }
+
+            Print(distance, verticesCount);
+        }
+
 
         private int AddPathToGridAndCountSwitches(List<PathFinderNodeDay22> path, long[,] finalGrid ) {
             var countSwitches = 0;
