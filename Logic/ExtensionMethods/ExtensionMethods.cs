@@ -143,5 +143,13 @@ namespace Logic.ExtensionMethods
             return options;
         }
 
+        public static List<T> Flatten<T, R>(this List<T> source, Func<T, R> recursion) where R : List<T>
+        {
+            return source.SelectMany(x => (recursion(x) != null && recursion(x).Any()) ? recursion(x).Flatten(recursion) : null)
+                         .Where(x => x != null).ToList();
+        }
+
+
+
     }
 }
