@@ -29,9 +29,12 @@ namespace Logic.Days
         public override string Part1()
         {
             var puzzleRegex = "^WSSEESWWWNW(S|NENNEEEENN(ESSSSW(NWSW|SSEN)|WSWWN(E|WWS(E|SS))))$";
-            puzzleRegex = "^ENWWW(NEEE|SSE(EE|N))$";
-            puzzleRegex = "^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$";
-            puzzleRegex = "^ESSWWN(E|NNENN(EESS(WNSE|)SSS|WWWSSSSE(SW|NNNE)))$";
+            //puzzleRegex = PuzzleInput;
+            //puzzleRegex = "^WNE$";
+            //puzzleRegex = "^ENWWW(NEEE|SSE(EE|N))$";
+            //puzzleRegex = "^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$";
+
+            //puzzleRegex = "^ESSWWN(E|NNENN(EESS(WNSE|)SSS|WWWSSSSE(SW|NNNE)))$";
             var parentNode = new PuzzleRoute("");
             var sb = new StringBuilder();
 
@@ -46,18 +49,42 @@ namespace Logic.Days
             }
 
             var grid = CreateGrid(puzzleRoute);
-            var rooms = FindRooms(grid.Item2);
+            var rooms = FindRooms(grid);
+            //Print(grid.Item2);
 
-            var pathfinder = new PathFinderDay20(grid.Item2);
+            
             var longestPath = 0;
             Print(grid.Item2);
+            var longPath = new List<PathFinderNodeDay20>();
             for (int i = 0; i < rooms.Count; i++)
             {
+                var pathfinder = new PathFinderDay20(grid.Item2);
+
+                //if (grid.Item1.X == rooms[i].X && grid.Item1.Y == rooms[i].Y) {
+                //    var bv = 1;
+                //}
                 var countPath = pathfinder.FindPath(new Point(grid.Item1.X, grid.Item1.Y), new Point(rooms[i].X, rooms[i].Y));
-                if (countPath.Count > longestPath) longestPath = countPath.Count;
+                if (countPath != null)
+                {
+                    if (countPath.Count > longestPath)
+                    {
+                        longestPath = countPath.Count;
+                        longPath = countPath;
+                    }
+                }
             }
-           
-            return longestPath.ToString();
+
+
+            foreach (var step in longPath)
+            {
+                grid.Item2[step.X, step.Y] = 'S';
+            }
+            grid.Item2[longPath.Last().X, longPath.Last().Y] = 'E';
+            grid.Item2[longPath.First().X, longPath.First().Y] = 'F';
+            Print(grid.Item2);
+            var bb = ((longestPath - 1) / 2).ToString();
+            return bb;
+            //749 TO LOW
         }
 
         //public static bool IsAdjacent(Pixel fromindex, Pixel relatedIndex) =>
@@ -66,23 +93,24 @@ namespace Logic.Days
         //           (relatedIndex.X == fromindex.X + 1 && relatedIndex.Y == fromindex.Y) ||
         //           (relatedIndex.X == fromindex.X - 1 && relatedIndex.Y == fromindex.Y);
 
-        private List<Pixel> FindRooms(int[,] grid)
+        private List<Pixel> FindRooms((Pixel,int[,]) grid)
         {
             var rooms = new List<Pixel>();
 
-            for (int y = grid.GetUpperBound(1) - 1; y >= 1; y--)
+            for (int y = grid.Item2.GetUpperBound(1) - 1; y >= 1; y--)
             {
-                for (int x = 1; x <= grid.GetUpperBound(0) - 1; x++)
+                for (int x = 1; x <= grid.Item2.GetUpperBound(0) - 1; x++)
                 {
-                    if (grid[x, y] == '.')
+                    if (grid.Item2[x, y] == '.')
                     {
-                        var left = grid[x - 1, y];
-                        var right = grid[x + 1, y];
-                        var up = grid[x, y + 1];
-                        var down = grid[x, y - 1];
+                        var left = grid.Item2[x - 1, y];
+                        var right = grid.Item2[x + 1, y];
+                        var up = grid.Item2[x, y + 1];
+                        var down = grid.Item2[x, y - 1];
                         if (left + right + up + down == '-' || left + right + up + down == '|')
                         {
-                            rooms.Add(new Pixel(x, y));
+                            //if (grid.Item1.X != x && grid.Item1.Y != y)
+                                rooms.Add(new Pixel(x, y));
                         }
                     }
                 }
@@ -154,14 +182,25 @@ namespace Logic.Days
         private void AddBranchPixel(PuzzleRoute puzzleRoute, Pixel indexPixel)
         {
             var mainPixel = indexPixel;
-            AddMainPixels(puzzleRoute, mainPixel);
+            var mainRoutes = puzzleRoute.Puzzle.ToString().Split(".");
 
-            foreach (var branch in puzzleRoute.Branches)
+            for (int i = 0; i < mainRoutes.Length; i++)
             {
-                foreach (var optionalRoute in branch.Options)
+                var mainRouteValue = mainRoutes[i];
+
+                if (!string.IsNullOrEmpty(mainRouteValue))
                 {
-                    var branchPixel = new Pixel(mainPixel.X, mainPixel.Y);
-                    AddBranchPixel(optionalRoute, branchPixel);
+                    AddMainPixels(puzzleRoute, mainPixel, mainRouteValue);
+                    for (int branchi = i; branchi < puzzleRoute.Branches.Count; branchi++)
+                    {
+                        //  foreach (var branch in puzzleRoute.Branches)
+                        //{
+                        foreach (var optionalRoute in puzzleRoute.Branches[i].Options)
+                        {
+                            var branchPixel = new Pixel(mainPixel.X, mainPixel.Y);
+                            AddBranchPixel(optionalRoute, branchPixel);
+                        }
+                    }
                 }
             }
         }
@@ -169,6 +208,36 @@ namespace Logic.Days
         private void AddMainPixels(PuzzleRoute puzzleRoute, Pixel indexPixel)
         {
             foreach (var direction in puzzleRoute.Puzzle.ToString())
+            {
+                switch (direction)
+                {
+                    case 'N':
+                        puzzleRoute.Coordinates.Add(new Pixel(indexPixel.X, ++indexPixel.Y));
+                        puzzleRoute.Coordinates.Add(new Pixel(indexPixel.X, ++indexPixel.Y));
+                        break;
+                    case 'E':
+                        puzzleRoute.Coordinates.Add(new Pixel(++indexPixel.X, indexPixel.Y));
+                        puzzleRoute.Coordinates.Add(new Pixel(++indexPixel.X, indexPixel.Y));
+                        break;
+                    case 'W':
+                        puzzleRoute.Coordinates.Add(new Pixel(--indexPixel.X, indexPixel.Y));
+                        puzzleRoute.Coordinates.Add(new Pixel(--indexPixel.X, indexPixel.Y));
+                        break;
+                    case 'S':
+                        puzzleRoute.Coordinates.Add(new Pixel(indexPixel.X, --indexPixel.Y));
+                        puzzleRoute.Coordinates.Add(new Pixel(indexPixel.X, --indexPixel.Y));
+                        break;
+                    default:
+                        break;
+                }
+            }
+            Coordinates.AddRange(puzzleRoute.Coordinates);
+        }
+
+
+        private void AddMainPixels(PuzzleRoute puzzleRoute, Pixel indexPixel, string puzzleRouteString)
+        {
+            foreach (var direction in puzzleRouteString)
             {
                 switch (direction)
                 {
@@ -227,6 +296,7 @@ namespace Logic.Days
                     opt = opt.Remove(0, 1);
                     if (character == '(')
                     {
+                        optionalRoute.Puzzle.Append('.');
                         var getTotalBranch = opt.GetStringTillClosing();
                         var childBranch = GetChildBranch(getTotalBranch);
                         optionalRoute.Branches.Add(childBranch);
@@ -238,12 +308,12 @@ namespace Logic.Days
                     }
                     else
                     {
-                        if (createNewPuzzleRoute)
-                        {
-                            optionalRoute = new PuzzleRoute();
-                            mainRoutes.Options.Add(optionalRoute);
-                            createNewPuzzleRoute = false;
-                        }
+                        //if (createNewPuzzleRoute)
+                        //{
+                        //    optionalRoute = new PuzzleRoute();
+                        //    mainRoutes.Options.Add(optionalRoute);
+                        //    createNewPuzzleRoute = false;
+                        //}
                         optionalRoute.Puzzle.Append(character);
                     }
                 }
