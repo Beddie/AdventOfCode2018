@@ -95,12 +95,6 @@ namespace Logic.Service.Pathfinder
                     break;
                 }
 
-                if (mClose.Count > mSearchLimit)
-                {
-                    mStopped = true;
-                    return null;
-                }
-
                 for (int i = 0; i < 4; i++)
                 {
                     PathFinderNodeDay20 newNode;
@@ -111,10 +105,12 @@ namespace Logic.Service.Pathfinder
                         continue;
 
                     int newG;
-                    if (mHeavyDiagonals && i > 3)
-                        newG = parentNode.G + (int)(mGrid[newNode.X, newNode.Y] * 2.41);
-                    else
-                        newG = parentNode.G + mGrid[newNode.X, newNode.Y];
+
+
+                    var val = mGrid[newNode.X, newNode.Y];
+                    if (val > 0)  val = 1;
+
+                    newG = parentNode.G + val;
 
                     if (newG == parentNode.G) continue;
 
@@ -142,7 +138,7 @@ namespace Logic.Service.Pathfinder
                             break;
                         }
                     }
-                    if (foundInOpenIndex != -1 && mOpen[foundInOpenIndex].G <= newG)  continue;
+                    if (foundInOpenIndex != -1 && mOpen[foundInOpenIndex].G <= newG) continue;
 
                     int foundInCloseIndex = -1;
                     for (int j = 0; j < mClose.Count; j++)

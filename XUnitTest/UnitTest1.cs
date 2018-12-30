@@ -22,7 +22,7 @@ namespace XUnitTest
                 var sw = new Stopwatch();
                 sw.Start();
                 var day = RenderDay.GetDay(20);
-                var check = day.Part1();
+                var check = day.Part2();
                // if (check != day.Solution()[0]) throw new Exception("Niet get goede antwoord!");
                 sw.Stop();
                 averageRunTime.Add(sw.ElapsedMilliseconds);
