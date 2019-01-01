@@ -2,13 +2,11 @@
 using Logic.Properties;
 using Logic.Service.Pathfinder;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Logic.Days
 {
@@ -218,7 +216,7 @@ namespace Logic.Days
             return returnGrid;
         }
 
-        public List<Pixel> Coordinates { get; set; }  = new List<Pixel>();
+        public List<Pixel> Coordinates { get; set; } = new List<Pixel>();
 
         private void AddBranchPixel(PuzzleRoute puzzleRoute, Pixel indexPixel)
         {
@@ -251,26 +249,27 @@ namespace Logic.Days
                 switch (direction)
                 {
                     case 'N':
-                        puzzleRoute.Coordinates.Add(new Pixel(indexPixel.X, ++indexPixel.Y));
-                        puzzleRoute.Coordinates.Add(new Pixel(indexPixel.X, ++indexPixel.Y));
+                        Coordinates.Add(new Pixel(indexPixel.X, ++indexPixel.Y));
+                        Coordinates.Add(new Pixel(indexPixel.X, ++indexPixel.Y));
                         break;
                     case 'E':
-                        puzzleRoute.Coordinates.Add(new Pixel(++indexPixel.X, indexPixel.Y));
-                        puzzleRoute.Coordinates.Add(new Pixel(++indexPixel.X, indexPixel.Y));
+                        Coordinates.Add(new Pixel(++indexPixel.X, indexPixel.Y));
+                        Coordinates.Add(new Pixel(++indexPixel.X, indexPixel.Y));
                         break;
                     case 'W':
-                        puzzleRoute.Coordinates.Add(new Pixel(--indexPixel.X, indexPixel.Y));
-                        puzzleRoute.Coordinates.Add(new Pixel(--indexPixel.X, indexPixel.Y));
+                        Coordinates.Add(new Pixel(--indexPixel.X, indexPixel.Y));
+                        Coordinates.Add(new Pixel(--indexPixel.X, indexPixel.Y));
                         break;
                     case 'S':
-                        puzzleRoute.Coordinates.Add(new Pixel(indexPixel.X, --indexPixel.Y));
-                        puzzleRoute.Coordinates.Add(new Pixel(indexPixel.X, --indexPixel.Y));
+
+                        Coordinates.Add(new Pixel(indexPixel.X, --indexPixel.Y));
+                        Coordinates.Add(new Pixel(indexPixel.X, --indexPixel.Y));
                         break;
                     default:
                         break;
                 }
             }
-            Coordinates.AddRange(puzzleRoute.Coordinates);
+            //Coordinates.AddRange(puzzleRoute.Coordinates);
         }
 
         public class Pixel
@@ -281,14 +280,31 @@ namespace Logic.Days
                 Y = y;
             }
 
-            public List<Pixel> AdjacencyList(List<Pixel> Coordinates) => Coordinates.Where(c =>
-            (c.X == X - 1 && c.Y == Y)
-            || (c.X == X + 1 && c.Y == Y)
-             || (c.X == Y + 1 && c.X == X)
-             || (c.X == Y - 1 && c.X == X)
+            public int Distance { get; set; }
+
+            public List<Pixel> Neighbours(List<Pixel> coords, int[,] grid)
+            {
+                var adjacentRooms = coords.Where(c =>
+            (c.X == X - 2 && c.Y == Y)
+            || (c.X == X + 2 && c.Y == Y)
+             || (c.Y == Y + 2 && c.X == X)
+             || (c.Y == Y - 2 && c.X == X)
             ).ToList();
 
-            //public List<Pixel> AdjacencyList = new List<Pixel>();
+                var retPixels = new List<Pixel>();
+                for (int i = 0; i < adjacentRooms.Count; i++)
+                {
+                    var room = adjacentRooms[i];
+                    var shiftPixel = new Pixel((X - room.X) / 2, (Y - room.Y) / 2);
+                    var structure = grid[room.X + shiftPixel.X, room.Y + shiftPixel.Y];
+                    if (structure == '|' || structure == '-')
+                    {
+                        retPixels.Add(room);
+                    }
+                };
+                return retPixels;
+            }
+
             public int X { get; set; }
             public int Y { get; set; }
         }
@@ -368,8 +384,6 @@ namespace Logic.Days
 
             var puzzleRoute = CreateChilds(puzzleRegex.Replace("^", "").Replace("$", ""));
 
-            //var coordinates = new List<Pixel>();
-
             var indexPixel = new Pixel(0, 0);
             foreach (var mainRoute in puzzleRoute.Options)
             {
@@ -382,93 +396,62 @@ namespace Logic.Days
             PrintGRID(newGrid);
             var atLeast = Test ? 31 : 1000;
             var longPath = new List<PathFinderNodeDay20>();
-            var count = 0;
 
             var coordinates = new List<Pixel>();
             coordinates.AddRange(Coordinates.Where(c => Math.Abs(c.X) % 2 == 0 && Math.Abs(c.Y) % 2 == 0).ToList());
 
+            var testco = coordinates[0];
+            var howmanydouble = coordinates.Where(x => x == testco).ToList();
 
-            var fd = coordinates.Max(c=> c.X);
-            for (int i = 0; i < coordinates.Count; i++)
+            var newCoordinates = new List<Pixel>();
+
+            for (var k = 0; k < coordinates.Count; k++)
             {
-                coordinates[i].X = coordinates[i].X + 1;
-                coordinates[i].Y = coordinates[i].Y + 1;
+                if (!newCoordinates.Any(c => c.X == coordinates[k].X + shiftPixel.X && c.Y == coordinates[k].Y + shiftPixel.Y))
+                {
+                    newCoordinates.Add(new Pixel(coordinates[k].X + shiftPixel.X, coordinates[k].Y + shiftPixel.Y));
+                }
             }
-            var fd2 = coordinates.Max(c => c.X);
 
-            //TODO check why add+1 adds +2
-
-            // Coordinates.ForEach(c => { c.X += shiftPixel.X; c.Y += shiftPixel.Y; });
+            coordinates = newCoordinates;
             var rooms = FindRooms(grid);
             var roomStack = new Stack<Pixel>();
             rooms.ForEach(c => roomStack.Push(c));
 
-            
-            var totalCount = coordinates.Count;
-            var farCoordinates = new List<Pixel>();
-            var shortCoordinates = new List<Pixel>();
-            //Parallel.For(0, checkPart2Coordinates.Count, (i) =>
-            for (int i = 0; i < coordinates.Count; i++)
+            var pixels = new List<Pixel>();
+            DFS(grid.Item2, coordinates, grid.Item1, c => pixels.Add(c));
+
+            var bb = pixels.Where(c => c.Distance >= (Test ? 31 : 1000)).Count();
+            var cc = pixels.Max(c => c.Distance);
+
+            foreach (var pix in pixels)
             {
-                var coordinate = coordinates[i];
-                Pixel tryPixel;
-                if (roomStack.TryPop(out tryPixel))
-                {
-                    i--;
-                     coordinate = tryPixel;
+                grid.Item2[pix.X, pix.Y] = (char)(pix.Distance.ToString().Last());
+            }
 
-                }
-                else
-                {
-                    totalCount--;
-                }
-
-
-                if (!shortCoordinates.Any(c => c.X == coordinate.X && c.Y == coordinate.Y)
-                    && !farCoordinates.Any(c => c.X == coordinate.X && c.Y == coordinate.Y)
-                    )
-                {
-
-                    //var newgrid2 = (int[,])newGrid.Clone(); // Select(a => a.ToArray()).ToArray();
-                    var pathfinder = new PathFinderDay20(newGrid);
-
-                    var countPath = pathfinder.FindPath(new Point(grid.Item1.X, grid.Item1.Y), new Point(coordinate.X, coordinate.Y));
-                    if (countPath != null)
-                    {
-
-                        var roomCOunt = (countPath.Count) / 2;
-                        var shortPaths = countPath.Take(atLeast * 2).Where(c => c.X % 2 == 1 && c.Y % 2 == 1).Select(c => new Pixel(c.X, c.Y));
-                        var longPaths = countPath.Skip(atLeast * 2).Where(c => c.X % 2 == 1 && c.Y % 2 == 1).Select(c => new Pixel(c.X, c.Y));
-
-                        shortCoordinates.AddRange(shortPaths.Where(c => !shortCoordinates.Any(d => d.X == c.X && d.Y == c.Y)));
-                        farCoordinates.AddRange(longPaths.Where(c => !farCoordinates.Any(d => d.X == c.X && d.Y == c.Y)));
-
-                    }
-                }
-            };
-
-            var bb = farCoordinates.Count().ToString();
-            return bb;
+            Print(grid.Item2);
+            return bb.ToString();
+            //8522 TO LOW
+            //8535 NOT RIGHT
+            //8536 NOT RIGHT
+            //8540 NOT RIGHT
             //13977 TO HIGH
         }
 
         private object lockCount = new object();
 
-        public HashSet<T> DFS<T>(Graph<T> graph, T start, Action<T> preVisit = null)
+        public HashSet<Pixel> DFS(int[,] grid, List<Pixel> coordinates, Pixel start, Action<Pixel> preVisit = null)
         {
-            var visited = new HashSet<T>();
+            var visited = new HashSet<Pixel>();
 
-            if (!graph.AdjacencyList.ContainsKey(start))
-                return visited;
-
-            var stack = new Stack<T>();
+            var stack = new Stack<Pixel>();
             stack.Push(start);
 
             while (stack.Count > 0)
             {
                 var vertex = stack.Pop();
 
-                if (visited.Contains(vertex))
+                if (visited.Any(c => c.X == vertex.X && c.Y == vertex.Y))
                     continue;
 
                 if (preVisit != null)
@@ -476,41 +459,15 @@ namespace Logic.Days
 
                 visited.Add(vertex);
 
-                foreach (var neighbor in graph.AdjacencyList[vertex])
-                    if (!visited.Contains(neighbor))
+                //find all neighbours
+                foreach (var neighbor in vertex.Neighbours(coordinates, grid))
+                    if (!visited.Any(c => c.X == neighbor.X && c.Y == neighbor.Y))
+                    {
+                        neighbor.Distance = vertex.Distance + 1;
                         stack.Push(neighbor);
+                    }
             }
-
             return visited;
-        }
-
-        public class Graph<T>
-        {
-            public Graph() { }
-            public Graph(IEnumerable<T> vertices, IEnumerable<Tuple<T, T>> edges)
-            {
-                foreach (var vertex in vertices)
-                    AddVertex(vertex);
-
-                foreach (var edge in edges)
-                    AddEdge(edge);
-            }
-
-            public Dictionary<T, HashSet<T>> AdjacencyList { get; } = new Dictionary<T, HashSet<T>>();
-
-            public void AddVertex(T vertex)
-            {
-                AdjacencyList[vertex] = new HashSet<T>();
-            }
-
-            public void AddEdge(Tuple<T, T> edge)
-            {
-                if (AdjacencyList.ContainsKey(edge.Item1) && AdjacencyList.ContainsKey(edge.Item2))
-                {
-                    AdjacencyList[edge.Item1].Add(edge.Item2);
-                    AdjacencyList[edge.Item2].Add(edge.Item1);
-                }
-            }
         }
     }
 }
