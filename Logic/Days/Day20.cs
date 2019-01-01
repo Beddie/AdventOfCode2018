@@ -1,15 +1,14 @@
 ﻿using Logic.ExtensionMethods;
 using Logic.Properties;
-using Logic.Service.Pathfinder;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 
 namespace Logic.Days
 {
+    //TODO refactor
     public class Day20 : AdventBase
     {
         public Day20()
@@ -22,26 +21,17 @@ namespace Logic.Days
 
         public override string[] Solution()
         {
-            return new string[] { "3046", ""
+            return new string[] { "3046", "8545"
             };
         }
 
         public override string Part1()
         {
-            var puzzleRegex = "^WSSEESWWWNW(S|NENNEEEENN(ESSSSW(NWSW|SSEN)|WSWWN(E|WWS(E|SS))))$";
-            puzzleRegex = PuzzleInput;
-            //puzzleRegex = "^WNE$";
-            //puzzleRegex = "^ENWWW(NEEE|SSE(EE|N))$";
-            //puzzleRegex = "^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$";
-
-            //puzzleRegex = "^ESSWWN(E|NNENN(EESS(WNSE|)SSS|WWWSSSSE(SW|NNNE)))$";
-            //puzzleRegex = "^ESSWWN(E|NNENN(EESS(WNSE|)SSSSSSSSS(WW|EE(S(WSNE|)|N))|WWWSSSSE(SW|NNNE)))$";
+            var puzzleRegex = PuzzleInput;
             var parentNode = new PuzzleRoute("");
             var sb = new StringBuilder();
 
-            var puzzleRoute = CreateChilds(puzzleRegex.Replace("^", "").Replace("$", ""));
-
-            var coordinates = new List<Pixel>();
+            var puzzleRoute = GetChildBranch(puzzleRegex.Replace("^", "").Replace("$", ""));
 
             var indexPixel = new Pixel(0, 0);
             foreach (var mainRoute in puzzleRoute.Options)
@@ -50,70 +40,44 @@ namespace Logic.Days
             }
 
             var grid = CreateGrid(puzzleRoute);
-            var rooms = FindRooms(grid);
-            var longestPath = 0;
-            var newGrid = PrepareGrid(grid.Item2);
-            PrintGRID(newGrid);
-            var longPath = new List<PathFinderNodeDay20>();
+            var shiftPixel = grid.Item3;
 
-            for (int i = 0; i < rooms.Count; i++)
+            if (Test)
             {
-                var pathfinder = new PathFinderDay20(newGrid);
+                var newGrid = PrepareGrid(grid.Item2);
+                PrintGRID(newGrid);
+            }
+            var atLeast = Test ? 31 : 1000;
 
-                var countPath = pathfinder.FindPath(new Point(grid.Item1.X, grid.Item1.Y), new Point(rooms[i].X, rooms[i].Y));
-                if (countPath != null)
+            var coordinates = new List<Pixel>();
+            coordinates.AddRange(Coordinates.Where(c => Math.Abs(c.X) % 2 == 0 && Math.Abs(c.Y) % 2 == 0).ToList());
+
+            var distinctCoordinates = new List<Pixel>();
+            for (var k = 0; k < coordinates.Count; k++)
+            {
+                if (!distinctCoordinates.Any(c => c.X == coordinates[k].X + shiftPixel.X && c.Y == coordinates[k].Y + shiftPixel.Y))
                 {
-                    if (countPath.Count > longestPath)
-                    {
-                        longestPath = countPath.Count;
-                        longPath = countPath;
-                    }
+                    distinctCoordinates.Add(new Pixel(coordinates[k].X + shiftPixel.X, coordinates[k].Y + shiftPixel.Y));
                 }
             }
 
-            var pathfinder2 = new PathFinderDay20(newGrid);
+            coordinates = distinctCoordinates;
 
-            var countPathShortest = pathfinder2.FindPath(new Point(grid.Item1.X, grid.Item1.Y), new Point(longPath.Last().X, longPath.Last().Y));
-            if (countPathShortest != null)
+            var pixels = new List<Pixel>();
+            DFS(grid.Item2, coordinates, grid.Item1, c => pixels.Add(c));
+
+            var cc = pixels.Max(c => c.Distance);
+
+            if (Test)
             {
-                longestPath = countPathShortest.Count;
-                longPath = countPathShortest;
-            }
-
-            foreach (var step in longPath)
-            {
-                newGrid[step.X, step.Y] = 'S';
-            }
-            newGrid[longPath.Last().X, longPath.Last().Y] = 'E';
-            newGrid[longPath.First().X, longPath.First().Y] = 'F';
-            Print(newGrid);
-            var bb = ((longestPath - 1) / 2).ToString();
-            return bb;
-        }
-
-        private List<Pixel> FindRooms((Pixel, int[,], Pixel) grid)
-        {
-            var rooms = new List<Pixel>();
-
-            for (int y = grid.Item2.GetUpperBound(1) - 1; y >= 1; y--)
-            {
-                for (int x = 1; x <= grid.Item2.GetUpperBound(0) - 1; x++)
+                foreach (var pix in pixels)
                 {
-                    if (grid.Item2[x, y] == '.')
-                    {
-                        var left = grid.Item2[x - 1, y];
-                        var right = grid.Item2[x + 1, y];
-                        var up = grid.Item2[x, y + 1];
-                        var down = grid.Item2[x, y - 1];
-                        if (left + right + up + down == '-' || left + right + up + down == '|')
-                        {
-                            //if (grid.Item1.X != x && grid.Item1.Y != y)
-                            rooms.Add(new Pixel(x, y));
-                        }
-                    }
+                    grid.Item2[pix.X, pix.Y] = (char)(pix.Distance.ToString().Last());
                 }
+
+                Print(grid.Item2);
             }
-            return rooms;
+            return cc.ToString();
         }
 
         private (Pixel, int[,], Pixel) CreateGrid(PuzzleRoute puzzleRoute)
@@ -205,9 +169,7 @@ namespace Logic.Days
                     }
                     else
                     {
-
-                        var val = 0;
-                        val = grid[x, y];
+                        var val = grid[x, y];
                         returnGrid[x, y] = val > 0 ? '.' : 0;
 
                     }
@@ -220,23 +182,19 @@ namespace Logic.Days
 
         private void AddBranchPixel(PuzzleRoute puzzleRoute, Pixel indexPixel)
         {
-            var mainPixel = indexPixel;
             var mainRoutes = puzzleRoute.Puzzle.ToString().Split(".");
 
             for (int i = 0; i < mainRoutes.Length; i++)
             {
                 var mainRouteValue = mainRoutes[i];
 
-                if (!string.IsNullOrEmpty(mainRouteValue))
+                AddMainPixels(puzzleRoute, indexPixel, mainRouteValue);
+                for (int branchi = i; branchi < puzzleRoute.Branches.Count; branchi++)
                 {
-                    AddMainPixels(puzzleRoute, mainPixel, mainRouteValue);
-                    for (int branchi = i; branchi < puzzleRoute.Branches.Count; branchi++)
+                    foreach (var optionalRoute in puzzleRoute.Branches[i].Options)
                     {
-                        foreach (var optionalRoute in puzzleRoute.Branches[i].Options)
-                        {
-                            var branchPixel = new Pixel(mainPixel.X, mainPixel.Y);
-                            AddBranchPixel(optionalRoute, branchPixel);
-                        }
+                        var branchPixel = new Pixel(indexPixel.X, indexPixel.Y);
+                        AddBranchPixel(optionalRoute, branchPixel);
                     }
                 }
             }
@@ -269,27 +227,29 @@ namespace Logic.Days
                         break;
                 }
             }
-            //Coordinates.AddRange(puzzleRoute.Coordinates);
         }
 
         public class Pixel
         {
+
+            public int X { get; set; }
+            public int Y { get; set; }
+            public int Distance { get; set; }
+
             public Pixel(int x, int y)
             {
                 X = x;
                 Y = y;
             }
 
-            public int Distance { get; set; }
-
             public List<Pixel> Neighbours(List<Pixel> coords, int[,] grid)
             {
                 var adjacentRooms = coords.Where(c =>
-            (c.X == X - 2 && c.Y == Y)
-            || (c.X == X + 2 && c.Y == Y)
-             || (c.Y == Y + 2 && c.X == X)
-             || (c.Y == Y - 2 && c.X == X)
-            ).ToList();
+                (c.X == X - 2 && c.Y == Y)
+                || (c.X == X + 2 && c.Y == Y)
+                 || (c.Y == Y + 2 && c.X == X)
+                 || (c.Y == Y - 2 && c.X == X)
+                ).ToList();
 
                 var retPixels = new List<Pixel>();
                 for (int i = 0; i < adjacentRooms.Count; i++)
@@ -304,11 +264,7 @@ namespace Logic.Days
                 };
                 return retPixels;
             }
-
-            public int X { get; set; }
-            public int Y { get; set; }
         }
-
 
         public PuzzleRoute GetChildBranch(string str)
         {
@@ -345,14 +301,6 @@ namespace Logic.Days
             return mainRoutes;
         }
 
-
-        private PuzzleRoute CreateChilds(string stream)
-        {
-            //Get everything from first ( to  last closing )
-            var subChilds = GetChildBranch(stream);
-            return subChilds;
-        }
-
         public class PuzzleRoute
         {
             public PuzzleRoute(string input)
@@ -370,19 +318,11 @@ namespace Logic.Days
 
         public override string Part2()
         {
-            //Test = true;
-            var puzzleRegex = "^WSSEESWWWNW(S|NENNEEEENN(ESSSSW(NWSW|SSEN)|WSWWN(E|WWS(E|SS))))$";
-            puzzleRegex = PuzzleInput;
-            //puzzleRegex = "^WNE$";
-            //puzzleRegex = "^ENWWW(NEEE|SSE(EE|N))$";
-            //puzzleRegex = "^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$";
-
-            //puzzleRegex = "^ESSWWN(E|NNENN(EESS(WNSE|)SSS|WWWSSSSE(SW|NNNE)))$";
-            //puzzleRegex = "^ESSWWN(E|NNENN(EESS(WNSE|)SSSSSSSSS(WW|EE(S(WSNE|)|N))|WWWSSSSE(SW|NNNE)))$";
+            var puzzleRegex = PuzzleInput;
             var parentNode = new PuzzleRoute("");
             var sb = new StringBuilder();
 
-            var puzzleRoute = CreateChilds(puzzleRegex.Replace("^", "").Replace("$", ""));
+            var puzzleRoute = GetChildBranch(puzzleRegex.Replace("^", "").Replace("$", ""));
 
             var indexPixel = new Pixel(0, 0);
             foreach (var mainRoute in puzzleRoute.Options)
@@ -392,53 +332,44 @@ namespace Logic.Days
 
             var grid = CreateGrid(puzzleRoute);
             var shiftPixel = grid.Item3;
-            var newGrid = PrepareGrid(grid.Item2);
-            PrintGRID(newGrid);
+
+            if (Test)
+            {
+                var newGrid = PrepareGrid(grid.Item2);
+                PrintGRID(newGrid);
+            }
             var atLeast = Test ? 31 : 1000;
-            var longPath = new List<PathFinderNodeDay20>();
 
             var coordinates = new List<Pixel>();
             coordinates.AddRange(Coordinates.Where(c => Math.Abs(c.X) % 2 == 0 && Math.Abs(c.Y) % 2 == 0).ToList());
 
-            var testco = coordinates[0];
-            var howmanydouble = coordinates.Where(x => x == testco).ToList();
-
-            var newCoordinates = new List<Pixel>();
-
+            var distinctCoordinates = new List<Pixel>();
             for (var k = 0; k < coordinates.Count; k++)
             {
-                if (!newCoordinates.Any(c => c.X == coordinates[k].X + shiftPixel.X && c.Y == coordinates[k].Y + shiftPixel.Y))
+                if (!distinctCoordinates.Any(c => c.X == coordinates[k].X + shiftPixel.X && c.Y == coordinates[k].Y + shiftPixel.Y))
                 {
-                    newCoordinates.Add(new Pixel(coordinates[k].X + shiftPixel.X, coordinates[k].Y + shiftPixel.Y));
+                    distinctCoordinates.Add(new Pixel(coordinates[k].X + shiftPixel.X, coordinates[k].Y + shiftPixel.Y));
                 }
             }
 
-            coordinates = newCoordinates;
-            var rooms = FindRooms(grid);
-            var roomStack = new Stack<Pixel>();
-            rooms.ForEach(c => roomStack.Push(c));
+            coordinates = distinctCoordinates;
 
             var pixels = new List<Pixel>();
             DFS(grid.Item2, coordinates, grid.Item1, c => pixels.Add(c));
 
-            var bb = pixels.Where(c => c.Distance >= (Test ? 31 : 1000)).Count();
-            var cc = pixels.Max(c => c.Distance);
+            var part2 = pixels.Where(c => c.Distance >= (Test ? 31 : 1000)).Count();
 
-            foreach (var pix in pixels)
+            if (Test)
             {
-                grid.Item2[pix.X, pix.Y] = (char)(pix.Distance.ToString().Last());
+                foreach (var pix in pixels)
+                {
+                    grid.Item2[pix.X, pix.Y] = (char)(pix.Distance.ToString().Last());
+                }
+                Print(grid.Item2);
             }
 
-            Print(grid.Item2);
-            return bb.ToString();
-            //8522 TO LOW
-            //8535 NOT RIGHT
-            //8536 NOT RIGHT
-            //8540 NOT RIGHT
-            //13977 TO HIGH
+            return part2.ToString();
         }
-
-        private object lockCount = new object();
 
         public HashSet<Pixel> DFS(int[,] grid, List<Pixel> coordinates, Pixel start, Action<Pixel> preVisit = null)
         {

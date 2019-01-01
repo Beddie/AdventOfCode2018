@@ -23,7 +23,7 @@ namespace XUnitTest
                 sw.Start();
                 var day = RenderDay.GetDay(20);
                 var check = day.Part2();
-               // if (check != day.Solution()[0]) throw new Exception("Niet get goede antwoord!");
+                if (check != day.Solution()[1]) throw new Exception("Niet get goede antwoord!");
                 sw.Stop();
                 averageRunTime.Add(sw.ElapsedMilliseconds);
             }
