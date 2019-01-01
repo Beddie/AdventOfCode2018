@@ -39,10 +39,8 @@ namespace Logic.Service.Pathfinder
         private bool mStopped = true;
         private int mHoriz = 0;
         private int mHEstimate = 1;
-        private bool mPunishChangeDirection = false;
         private bool mReopenCloseNodes = true;
         private bool mTieBreaker = true;
-        private int mSearchLimit = 90000;
         #endregion
 
         #region Constructors
