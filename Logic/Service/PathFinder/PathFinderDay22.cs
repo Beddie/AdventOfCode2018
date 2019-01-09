@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Logic.Service.Pathfinder
 {
@@ -162,15 +163,101 @@ namespace Logic.Service.Pathfinder
             if (found)
             {
                 PathFinderNodeDay22 fNode = mClose[mClose.Count - 1];
-                for (int i = mClose.Count - 1; i >= 0; i--)
+                List<PathFinderNodeDay22> finalPathNodes = new List<PathFinderNodeDay22>();
+
+                finalPathNodes.Add(new PathFinderNodeDay22()
                 {
-                    if (fNode.PX == mClose[i].X && fNode.PY == mClose[i].Y && fNode.ParentCaveTool == mClose[i].CaveTool || i == mClose.Count - 1) fNode = mClose[i];
-                    else mClose.RemoveAt(i);
+                    CaveTool = fNode.CaveTool
+                           ,
+                    F = fNode.F
+                           ,
+                    G = fNode.G
+                           ,
+                    X = fNode.X
+                           ,
+                    Y = fNode.Y
+                           ,
+                    PX = fNode.PX
+                           ,
+                    PY = fNode.PY
+                           ,
+                    H = fNode.H
+                           ,
+                    ParentCaveTool = fNode.ParentCaveTool
+                });
+
+
+                var walkingToBegin = true;
+                while (walkingToBegin)
+                {
+                    List<PathFinderNodeDay22> fNodes = new List<PathFinderNodeDay22>();
+                    fNodes.AddRange(mClose.Where(c => fNode.PX == c.X && fNode.PY == c.Y && fNode.ParentCaveTool == c.CaveTool));
+
+                   var fNodesCostMinimum = fNodes.Where(c => c.G == fNodes.Min(e => e.G));
+                    if (fNodesCostMinimum.Count() > 1)
+                    {
+                        fNode = fNodesCostMinimum.Where(c => c.CaveTool == fNode.CaveTool).FirstOrDefault();
+                        if (fNode.G == 0) {
+                            fNode = fNodesCostMinimum.FirstOrDefault();
+                        }
+                    }
+                    else
+                    {
+                        fNode = fNodesCostMinimum.FirstOrDefault();
+                    }
+                    if (fNode.G > 0)
+                    {
+                        finalPathNodes.Add(new PathFinderNodeDay22()
+                        {
+                            CaveTool = fNode.CaveTool
+                            ,
+                            F = fNode.F
+                            ,
+                            G = fNode.G
+                            ,
+                            X = fNode.X
+                            ,
+                            Y = fNode.Y
+                            ,
+                            PX = fNode.PX
+                            ,
+                            PY = fNode.PY
+                            ,
+                            H = fNode.H
+                            ,
+                            ParentCaveTool = fNode.ParentCaveTool
+                        });
+                    }
+
+                    if (fNode.X == start.X && fNode.Y == start.Y)
+                    {
+                        finalPathNodes.Add(new PathFinderNodeDay22()
+                        {
+                            CaveTool = fNode.CaveTool
+                         ,
+                            F = fNode.F
+                         ,
+                            G = fNode.G
+                         ,
+                            X = fNode.X
+                         ,
+                            Y = fNode.Y
+                         ,
+                            PX = fNode.PX
+                         ,
+                            PY = fNode.PY
+                         ,
+                            H = fNode.H
+                         ,
+                            ParentCaveTool = fNode.ParentCaveTool
+                        });
+
+                        walkingToBegin = false;
+                    }
                 }
                 mStopped = true;
-                return mClose;
+                return finalPathNodes;
             }
-
             mStopped = true;
             return null;
         }
@@ -180,30 +267,15 @@ namespace Logic.Service.Pathfinder
             switch (toNodeCave)
             {
                 case '.':
-                    return new List<CaveTool> {  CaveTool.Torch, CaveTool.ClimbingGear };
+                    return new List<CaveTool> { CaveTool.Torch, CaveTool.ClimbingGear };
                 case '=':
-                    return new List<CaveTool> { CaveTool.ClimbingGear , CaveTool.None};
+                    return new List<CaveTool> { CaveTool.ClimbingGear, CaveTool.None };
                 case '|':
-                    return new List<CaveTool> { CaveTool.Torch,CaveTool.None };
+                    return new List<CaveTool> { CaveTool.Torch, CaveTool.None };
                 default:
                     return null;
             }
-
-            //var fromTool = 
-            //switch (toNodeCave)
-            //{
-            //    case '.':
-            //        return new List<(int, CaveTool)> { (caveToolInUse != (CaveTool)toNodeCave ? 7 : 0,  CaveTool.ClimbingGear), (caveToolInUse != (CaveTool)toNodeCave ? 7 : 0, CaveTool.Torch) };
-            //    case '=':
-            //        return new List<(int, CaveTool)> { (caveToolInUse != (CaveTool)toNodeCave ? 7 : 0, CaveTool.ClimbingGear), (caveToolInUse != (CaveTool)toNodeCave ? 7 : 0, CaveTool.None) };
-            //    case '|':
-            //        return new List<(int, CaveTool)> { (caveToolInUse != (CaveTool)toNodeCave ? 7 : 0, CaveTool.Torch), (caveToolInUse != (CaveTool)toNodeCave ? 7 : 0, CaveTool.None) };
-            //    default:
-            //        return null;
-            //}
         }
-
-
         #endregion
 
         internal class ComparePFNode : IComparer<PathFinderNodeDay22>
@@ -217,8 +289,5 @@ namespace Logic.Service.Pathfinder
                 return 0;
             }
         }
-
-
     }
-
 }

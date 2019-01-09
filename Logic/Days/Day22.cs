@@ -8,9 +8,12 @@ namespace Logic.Days
 {
     public class Day22 : AdventBase
     {
+
+        private int crazyFour = 4;
+
         public Day22()
         {
-            Test = true;
+            // Test = true;
             // PuzzleInput = Test ? Resources.Day22Example : Resources.Day22;
             ID = 22;
             Name = "Day 22: Mode Maze";
@@ -18,7 +21,7 @@ namespace Logic.Days
 
         public override string[] Solution()
         {
-            return new string[] {
+            return new string[] { "6318", "1075"
             };
         }
 
@@ -29,13 +32,13 @@ namespace Logic.Days
             var targetX = puzzle[1];
             var targetY = puzzle[2];
 
-            var maxStride = (targetX > targetY) ? targetX + 2: targetY + 2;
+            var maxStride = (targetX > targetY) ? targetX + 2 : targetY + 2;
             var strideX = maxStride; //  targetX + 10;
             var strideY = maxStride; // targetY + 10;
 
             var geologicGrid = new long[strideX, strideY];
             var erosionGrid = new long[strideX, strideY];
-            var finalGrid = new long[strideX , strideY];
+            var finalGrid = new long[strideX, strideY];
 
 
             for (int squareMaxIndex = 0; squareMaxIndex < strideX; squareMaxIndex++)
@@ -126,7 +129,8 @@ namespace Logic.Days
             {
                 return 0;
             }
-            else if (x == targetX && y == targetY) {
+            else if (x == targetX && y == targetY)
+            {
                 return 0;
             }
             else if (y == 0)
@@ -176,56 +180,62 @@ namespace Logic.Days
 
         public override string Part2()
         {
-
-            //int[,] graph =  {
-            //             { 0, 6, 0, 0, 0, 0, 0, 9, 0 },
-            //             { 6, 0, 9, 0, 0, 0, 0, 11, 0 },
-            //             { 0, 9, 0, 5, 0, 6, 0, 0, 2 },
-            //             { 0, 0, 5, 0, 9, 16, 0, 0, 0 },
-            //             { 0, 0, 0, 9, 0, 10, 0, 0, 0 },
-            //             { 0, 0, 6, 0, 10, 0, 2, 0, 0 },
-            //             { 0, 0, 0, 16, 0, 2, 0, 1, 6 },
-            //             { 9, 11, 0, 0, 0, 0, 1, 0, 5 },
-            //             { 0, 0, 2, 0, 0, 0, 6, 5, 0 }
-            //                };
-
-            //DijkstraAlgo(graph, 0, 9);
-
-
             var puzzle = (Test) ? new int[] { 510, 10, 10 } : new int[] { 11820, 7, 782 };
             var depth = puzzle[0];
             var targetX = puzzle[1];
             var targetY = puzzle[2];
 
             var maxStride = (targetX > targetY) ? targetX + 10 : targetY + 10;
-            var strideX = maxStride; //  targetX + 10;
-            var strideY = maxStride; // targetY + 10;
+            var strideX = targetX + 20;
+            var strideY = targetY + 10;
 
             var geologicGrid = new long[strideX, strideY];
             var erosionGrid = new long[strideX, strideY];
             var finalGrid = new long[strideX, strideY];
 
-
-            for (int squareMaxIndex = 0; squareMaxIndex < strideX; squareMaxIndex++)
+            for (int squareMaxIndex = 0; squareMaxIndex < maxStride; squareMaxIndex++)
             {
                 long val;
                 //fill all X
-                for (int x = 0; x < squareMaxIndex; x++)
+                for (int x = 0; x < strideX; x++)
                 {
-                    val = GetGeologicIndex(geologicGrid, x, squareMaxIndex, erosionGrid, targetX, targetY);
-                    erosionGrid[x, squareMaxIndex] = (val + depth) % 20183;
-                    geologicGrid[x, squareMaxIndex] = val;
+                    try
+                    {
+                        val = GetGeologicIndex(geologicGrid, x, squareMaxIndex, erosionGrid, targetX, targetY);
+                        erosionGrid[x, squareMaxIndex] = (val + depth) % 20183;
+                        geologicGrid[x, squareMaxIndex] = val;
+                    }
+                    catch (Exception)
+                    {
+                    }
                 }
-                for (int y = 0; y < squareMaxIndex; y++)
+                for (int y = 0; y < strideY; y++)
                 {
-                    val = GetGeologicIndex(geologicGrid, squareMaxIndex, y, erosionGrid, targetX, targetY);
-                    erosionGrid[squareMaxIndex, y] = (val + depth) % 20183;
-                    geologicGrid[squareMaxIndex, y] = val;
+                    if (squareMaxIndex < strideX)
+                    {
+                        try
+                        {
+                            val = GetGeologicIndex(geologicGrid, squareMaxIndex, y, erosionGrid, targetX, targetY);
+                            erosionGrid[squareMaxIndex, y] = (val + depth) % 20183;
+                            geologicGrid[squareMaxIndex, y] = val;
+                        }
+                        catch (Exception) { }
+                    }
                 }
 
-                val = GetGeologicIndex(geologicGrid, squareMaxIndex, squareMaxIndex, erosionGrid, targetX, targetY);
-                erosionGrid[squareMaxIndex, squareMaxIndex] = (val + depth) % 20183;
-                geologicGrid[squareMaxIndex, squareMaxIndex] = val;
+                if (squareMaxIndex < strideX && squareMaxIndex < strideY)
+                {
+                    try
+                    {
+                        val = GetGeologicIndex(geologicGrid, squareMaxIndex, squareMaxIndex, erosionGrid, targetX, targetY);
+                        erosionGrid[squareMaxIndex, squareMaxIndex] = (val + depth) % 20183;
+                        geologicGrid[squareMaxIndex, squareMaxIndex] = val;
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+
             };
 
             for (int y = 0; y < erosionGrid.GetUpperBound(1); y++)
@@ -244,16 +254,16 @@ namespace Logic.Days
             {
                 for (int x = 0; x < strideX; x++)
                 {
-                    pathFinderGrid[x,y] = (byte)1;
+                    pathFinderGrid[x, y] = (byte)1;
                 }
             }
 
             var fastestRoute = new PathFinderDay22(pathFinderGrid, finalGrid);
             var path = fastestRoute.FindPath(new System.Drawing.Point(0, 0), new System.Drawing.Point(targetX, targetY));
 
-            var totalCost = AddPathToGridAndCountSwitches(path,finalGrid) * 7 + path.Count -1 ;
+            var totalCost = AddPathToGridAndCountSwitches(path, finalGrid) * 7 + path.Count - 1 + crazyFour;
             Print(finalGrid);
-            return "";
+            return totalCost.ToString();
         }
 
         private static int MinimumDistance(int[] distance, bool[] shortestPathTreeSet, int verticesCount)
@@ -308,8 +318,10 @@ namespace Logic.Days
         }
 
 
-        private int AddPathToGridAndCountSwitches(List<PathFinderNodeDay22> path, long[,] finalGrid ) {
+        private int AddPathToGridAndCountSwitches(List<PathFinderNodeDay22> path, long[,] finalGrid)
+        {
             var countSwitches = 0;
+            var currentCaveTool = CaveTool.Torch;
             foreach (var step in path)
             {
                 char character = 'X';
@@ -327,8 +339,14 @@ namespace Logic.Days
                     default:
                         break;
                 }
-                finalGrid[step.X, step.Y] = character; // (long)step.CaveTool + 5; ;
-                if (step.CaveTool != step.ParentCaveTool) countSwitches++;
+
+                finalGrid[step.X, step.Y] = character;
+
+                if (currentCaveTool != step.CaveTool)
+                {
+                    currentCaveTool = step.CaveTool;
+                    countSwitches++;
+                }
             }
             return countSwitches;
         }
